@@ -11,7 +11,9 @@ import (
 	"github.com/wcrg/lissh/cmd/history"
 	"github.com/wcrg/lissh/cmd/hosts"
 	"github.com/wcrg/lissh/cmd/keys"
+	"github.com/wcrg/lissh/cmd/update"
 	"github.com/wcrg/lissh/internal/storage"
+	"github.com/wcrg/lissh/internal/version"
 )
 
 var (
@@ -27,7 +29,9 @@ func NewRootCmd() *cobra.Command {
 
 Quickly list and search hosts, assign friendly aliases, track your
 connection history, manage SSH keys, and tweak SSH settings - all
-without manually editing config files.`,
+without manually editing config files.
+
+Run 'lissh update --check' to check for updates or 'lissh update --install' to update.`,
 		RunE:                  runRoot,
 		DisableAutoGenTag:     true,
 		DisableFlagsInUseLine: true,
@@ -35,9 +39,21 @@ without manually editing config files.`,
 
 	rootCmd.PersistentFlags().StringVar(&dbPath, "db-path", "", "Path to lissh database (default: ~/.lissh/lissh.db)")
 	rootCmd.Flags().Int64VarP(new(int64), "id", "i", 0, "Connect to host by ID")
+	rootCmd.Flags().Bool("check-update", false, "Check for updates")
+	rootCmd.Flags().Bool("version", false, "Show version information")
+	rootCmd.SetVersionTemplate("lissh {{.Version}}\n")
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if cmd.Flags().Changed("version") {
+			fmt.Printf("lissh %s\n", version.String())
+			os.Exit(0)
+			return nil
+		}
 		if cmd.Name() == "lissh" && (len(args) > 0 || cmd.Flags().Changed("id")) {
+			return nil
+		}
+		if cmd.Flags().Changed("check-update") {
+			checkForUpdate()
 			return nil
 		}
 		var err error
@@ -63,8 +79,22 @@ without manually editing config files.`,
 	rootCmd.AddCommand(keys.NewKeysCmd())
 	rootCmd.AddCommand(history.NewHistoryCmd())
 	rootCmd.AddCommand(config.NewConfigCmd())
+	rootCmd.AddCommand(update.NewUpdateCmd())
 
 	return rootCmd
+}
+
+func checkForUpdate() {
+	currentVersion := version.Get()
+	latestVersion, err := version.CheckForUpdate()
+	if err != nil {
+		return
+	}
+
+	if latestVersion.GT(currentVersion) {
+		fmt.Printf("\n  New version available: v%s\n", latestVersion)
+		fmt.Println("  Run 'lissh update --install' to update.")
+	}
 }
 
 func runRoot(cmd *cobra.Command, args []string) error {

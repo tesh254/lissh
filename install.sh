@@ -92,3 +92,5 @@ fi
 
 echo ""
 echo "Run 'lissh --help' to get started!"
+echo ""
+echo "To update to a new version, run: lissh update --install"
