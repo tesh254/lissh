@@ -37,7 +37,9 @@ download() {
         ext="zip"
     fi
 
-    local filename="lissh_${os}_${arch}.${ext}"
+    local first=$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')
+    local rest=$(printf '%s' "$os" | cut -c2-)
+    local filename="lissh_${first}${rest}_${arch}.${ext}"
     local url="https://github.com/${REPO}/releases/download/${version}/${filename}"
 
     echo "Downloading ${filename}..."
@@ -64,8 +66,8 @@ fi
 
 VERSION="${1:-latest}"
 if [ "$VERSION" = "latest" ]; then
-    VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" | grep '"tag_name"' | sed 's/.*"v\?\([^"]*\)".*/\1/')
-    echo "Latest version: $VERSION"
+    VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name": "v\([^"]*\)".*/\1/p')
+    echo "Latest version: v$VERSION"
 fi
 
 OS=$(detect_os)
