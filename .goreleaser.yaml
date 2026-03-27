@@ -67,11 +67,3 @@ release:
     ```bash
     winget install wcrg.lissh
     ```
-
-dockers:
-  - image_templates:
-      - "ghcr.io/wcrg/lissh:{{ .Tag }}"
-      - "ghcr.io/wcrg/lissh:v{{ .Major }}"
-      - "ghcr.io/wcrg/lissh:v{{ .Major }}.{{ .Minor }}"
-      - "ghcr.io/wcrg/lissh:latest"
-    dockerfile: .docker/Dockerfile-goreleaser
