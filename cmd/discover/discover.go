@@ -312,7 +312,9 @@ func reviewHosts(cmd *cobra.Command, _ []string) error {
 		case "a":
 			fmt.Print("  Enter alias: ")
 			var alias string
-			fmt.Scanln(&alias)
+			if _, err := fmt.Scanln(&alias); err != nil {
+				alias = ""
+			}
 			if alias != "" {
 				if err := discoverDB.UpdateHost(h.ID, &alias, nil, nil, nil); err != nil {
 					fmt.Fprintf(os.Stderr, "Error: %v\n", err)

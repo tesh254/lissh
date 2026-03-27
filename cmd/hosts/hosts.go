@@ -194,7 +194,9 @@ func parseIP(s string) []int {
 		}
 		result := make([]int, 4)
 		for i, p := range parts {
-			fmt.Sscanf(p, "%d", &result[i])
+			if _, err := fmt.Sscanf(p, "%d", &result[i]); err != nil {
+				return nil
+			}
 		}
 		return result
 	}
@@ -452,7 +454,9 @@ func removeHost(cmd *cobra.Command, args []string) error {
 	if !confirm {
 		fmt.Print("This will permanently remove the host and all its history. Continue? (y/N): ")
 		var response string
-		fmt.Scanln(&response)
+		if _, err := fmt.Scanln(&response); err != nil {
+			response = ""
+		}
 		if response != "y" && response != "Y" {
 			fmt.Println("Aborted")
 			return nil
@@ -500,7 +504,9 @@ func pruneHosts(cmd *cobra.Command, _ []string) error {
 	if !confirm {
 		fmt.Print("\nRemove all inactive hosts and their history? (y/N): ")
 		var response string
-		fmt.Scanln(&response)
+		if _, err := fmt.Scanln(&response); err != nil {
+			response = ""
+		}
 		if response != "y" && response != "Y" {
 			fmt.Println("Aborted")
 			return nil

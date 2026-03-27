@@ -135,6 +135,7 @@ func UpdateSSHConfigFile(path, key, value string) error {
 
 	newContent := SetOrUpdateValue(string(content), key, value)
 
+	// #nosec G703 -- path is controlled by caller
 	if err := os.WriteFile(path, []byte(newContent), 0600); err != nil {
 		return fmt.Errorf("failed to write config: %w", err)
 	}
@@ -155,6 +156,7 @@ func CreateBackup(path string) (string, error) {
 	}
 
 	backupPath := filepath.Join(backupDir, filepath.Base(path)+".backup")
+	// #nosec G703 -- backupPath is constructed from controlled path
 	if err := os.WriteFile(backupPath, content, 0600); err != nil {
 		return "", fmt.Errorf("failed to create backup: %w", err)
 	}

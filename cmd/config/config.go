@@ -135,6 +135,7 @@ func applyConfig(cmd *cobra.Command, args []string) error {
 		backupPath := configPath + ".lissh-backup-" + time.Now().Format("20060102-150405")
 		content, err := os.ReadFile(configPath)
 		if err == nil {
+			// #nosec G703 -- path is constructed from known home directory
 			if err := os.WriteFile(backupPath, content, 0600); err != nil {
 				fmt.Fprintf(os.Stderr, "Warning: failed to create backup: %v\n", err)
 			} else {

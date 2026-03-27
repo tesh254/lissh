@@ -203,7 +203,9 @@ func (d *Discoverer) discoverSSHConfig() ([]*DiscoveredHost, error) {
 			case "HostName":
 				ip = strings.Trim(varMatches[2], "\" ")
 			case "Port":
-				fmt.Sscanf(varMatches[2], "%d", &port)
+				if _, err := fmt.Sscanf(varMatches[2], "%d", &port); err != nil {
+					port = 22
+				}
 			case "User":
 				user = strings.Trim(varMatches[2], "\" ")
 			}

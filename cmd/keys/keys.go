@@ -113,9 +113,10 @@ func listKeys(cmd *cobra.Command, _ []string) error {
 			size = fmt.Sprintf("%d", *k.SizeBits)
 		}
 		keyType := style.Bold.Render(k.KeyType)
-		if k.KeyType == "ed25519" {
+		switch k.KeyType {
+		case "ed25519":
 			keyType = style.OK.Render("ed25519")
-		} else if k.KeyType == "rsa" {
+		case "rsa":
 			keyType = style.Warning.Render("rsa")
 		}
 		pubPath := style.Dim.Render("N/A")
