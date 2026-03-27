@@ -11,14 +11,16 @@ import (
 	"github.com/blang/semver/v4"
 )
 
+const devVersion = "dev"
+
 var (
-	Version   = "dev"
+	Version   = devVersion
 	Commit    = ""
 	BuildDate = ""
 )
 
 func Get() semver.Version {
-	if Version == "dev" {
+	if Version == devVersion {
 		return semver.MustParse("0.0.0")
 	}
 	v, err := semver.Parse(strings.TrimPrefix(Version, "v"))
@@ -29,10 +31,10 @@ func Get() semver.Version {
 }
 
 func String() string {
-	if Version == "dev" {
+	if Version == devVersion {
 		info, ok := debug.ReadBuildInfo()
 		if !ok {
-			return "dev"
+			return devVersion
 		}
 		commit := ""
 		for _, s := range info.Settings {
@@ -44,7 +46,7 @@ func String() string {
 		if commit == "" {
 			commit = "unknown"
 		}
-		return fmt.Sprintf("dev (commit %s)", commit[:7])
+		return fmt.Sprintf("%s (commit %s)", devVersion, commit[:7])
 	}
 	return Version
 }

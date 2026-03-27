@@ -69,7 +69,9 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 	if !autoUpdate {
 		fmt.Print("\nWould you like to update? (y/N): ")
 		var response string
-		fmt.Scanln(&response)
+		if _, err := fmt.Scanln(&response); err != nil {
+			response = ""
+		}
 		if response != "y" && response != "Y" {
 			fmt.Println("Update cancelled.")
 			return nil
@@ -120,7 +122,8 @@ func downloadVersion(v semver.Version, tmpDir string) (string, error) {
 		ext = "zip"
 	}
 
-	filename := fmt.Sprintf("lissh_%s_%s.%s", strings.Title(goos), arch, ext)
+	osTitle := strings.ToUpper(goos[:1]) + goos[1:]
+	filename := fmt.Sprintf("lissh_%s_%s.%s", osTitle, arch, ext)
 	url := fmt.Sprintf("https://github.com/tesh254/lissh/releases/download/v%s/%s", v, filename)
 
 	resp, err := http.Get(url)
