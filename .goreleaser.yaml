@@ -54,16 +54,16 @@ release:
     
     ### Linux
     ```bash
-    curl -fsSL https://github.com/wcrg/lissh/releases/latest/download/lissh_Linux_x86_64.tar.gz | tar xz
+    curl -fsSL https://github.com/tesh254/lissh/releases/latest/download/lissh_Linux_x86_64.tar.gz | tar xz
     ```
     
     ### macOS
     ```bash
-    curl -fsSL https://github.com/wcrg/lissh/releases/latest/download/lissh_Darwin_x86_64.tar.gz | tar xz
+    curl -fsSL https://github.com/tesh254/lissh/releases/latest/download/lissh_Darwin_x86_64.tar.gz | tar xz
     ```
     
     ### Windows
     Download from releases page or use winget:
     ```bash
-    winget install wcrg.lissh
+    winget install tesh254.lissh
     ```
