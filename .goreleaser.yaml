@@ -1,16 +1,19 @@
 version: 2
 
+project_name: lissh
+
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
+
 builds:
   - env:
       - CGO_ENABLED=0
     goos:
       - linux
-      - windows
       - darwin
+      - windows
+    binary: lissh
 
 archives:
   - format: tar.gz
@@ -21,7 +24,6 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    # use zip for windows archives
     format_overrides:
       - goos: windows
         format: zip
@@ -33,23 +35,43 @@ snapshot:
   name_template: "{{ incpatch .Version }}-next"
 
 changelog:
+  use: git
   sort: asc
   filters:
     exclude:
       - "^docs:"
       - "^test:"
+      - "^Merge branch"
+      - "^Merge pull request"
 
-# snapcrafts:
-#   - title: go-cli-template
-#     publish: true
-#     summary: "go-cli-template"
-#     description: "go-cli-template"
-#     license: MIT
+release:
+  draft: false
+  prerelease: false
+  header: |
+    ## Installation
+    
+    Download the appropriate binary for your platform and add it to your PATH.
+    
+    ### Linux
+    ```bash
+    curl -fsSL https://github.com/wcrg/lissh/releases/latest/download/lissh_Linux_x86_64.tar.gz | tar xz
+    ```
+    
+    ### macOS
+    ```bash
+    curl -fsSL https://github.com/wcrg/lissh/releases/latest/download/lissh_Darwin_x86_64.tar.gz | tar xz
+    ```
+    
+    ### Windows
+    Download from releases page or use winget:
+    ```bash
+    winget install wcrg.lissh
+    ```
 
 dockers:
   - image_templates:
-      - "ghcr.io/emmanuelgautier/go-cli-template:{{ .Tag }}"
-      - "ghcr.io/emmanuelgautier/go-cli-template:v{{ .Major }}"
-      - "ghcr.io/emmanuelgautier/go-cli-template:v{{ .Major }}.{{ .Minor }}"
-      - "ghcr.io/emmanuelgautier/go-cli-template:latest"
+      - "ghcr.io/wcrg/lissh:{{ .Tag }}"
+      - "ghcr.io/wcrg/lissh:v{{ .Major }}"
+      - "ghcr.io/wcrg/lissh:v{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/wcrg/lissh:latest"
     dockerfile: .docker/Dockerfile-goreleaser
