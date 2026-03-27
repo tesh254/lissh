@@ -190,6 +190,7 @@ func backupConfig(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to read config: %w", err)
 	}
 
+	// #nosec G703 -- backupPath is constructed from controlled path
 	if err := os.WriteFile(backupPath, content, 0600); err != nil {
 		return fmt.Errorf("failed to create backup: %w", err)
 	}
@@ -209,6 +210,7 @@ func restoreConfig(cmd *cobra.Command, args []string) error {
 	home, _ := os.UserHomeDir()
 	configPath := filepath.Join(home, ".ssh", "config")
 
+	// #nosec G703 -- configPath is constructed from known home directory
 	if err := os.WriteFile(configPath, content, 0600); err != nil {
 		return fmt.Errorf("failed to restore config: %w", err)
 	}
@@ -278,6 +280,7 @@ func applySetting(key, value string) {
 	content, _ := os.ReadFile(configPath)
 	newContent := sshconfig.SetOrUpdateValue(string(content), key, value)
 
+	// #nosec G703 -- configPath is constructed from known home directory
 	if err := os.WriteFile(configPath, []byte(newContent), 0600); err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: failed to write config: %v\n", err)
 	}

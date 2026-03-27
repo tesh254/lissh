@@ -325,7 +325,9 @@ func reviewHosts(cmd *cobra.Command, _ []string) error {
 		case "n":
 			fmt.Print("  Enter notes: ")
 			var notes string
-			fmt.Scanln(&notes)
+			if _, err := fmt.Scanln(&notes); err != nil {
+				notes = ""
+			}
 			if notes != "" {
 				if err := discoverDB.UpdateHost(h.ID, nil, &notes, nil, nil); err != nil {
 					fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -344,7 +346,9 @@ func reviewHosts(cmd *cobra.Command, _ []string) error {
 				}
 				fmt.Print("  Enter key ID (or 0 to skip): ")
 				var keyID int64
-				fmt.Scanln(&keyID)
+				if _, err := fmt.Scanln(&keyID); err != nil {
+					keyID = 0
+				}
 				if keyID > 0 {
 					if err := discoverDB.UpdateHost(h.ID, nil, nil, &keyID, nil); err != nil {
 						fmt.Fprintf(os.Stderr, "Error: %v\n", err)
