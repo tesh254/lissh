@@ -143,6 +143,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Clean up changelog
+        run: rm -f CHANGELOG.md
+
       - name: Publish Release
         uses: goreleaser/goreleaser-action@v6
         with:
