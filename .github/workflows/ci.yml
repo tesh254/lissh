@@ -48,7 +48,6 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
       packages: write
@@ -65,21 +64,18 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Determine version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: version
         run: |
-          # Get last tag
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "Last tag: $LAST_TAG"
           
-          # Parse version parts
           LAST_MAJOR=$(echo $LAST_TAG | sed 's/v//' | cut -d. -f1)
           LAST_MINOR=$(echo $LAST_TAG | sed 's/v//' | cut -d. -f2)
           LAST_PATCH=$(echo $LAST_TAG | sed 's/v//' | cut -d. -f3)
           
-          # Default bump is patch
           BUMP_TYPE=${BUMP_TYPE:-patch}
           
-          # Check commit messages for bump hints
           COMMITS=$(git log --oneline $LAST_TAG..HEAD 2>/dev/null || git log --oneline -20)
           if echo "$COMMITS" | grep -qiE '^[^:]*:.*(breaking|major)'; then
             BUMP_TYPE="major"
@@ -87,7 +83,6 @@ jobs:
             BUMP_TYPE="minor"
           fi
           
-          # Calculate new version
           case $BUMP_TYPE in
             major)
               NEW_MAJOR=$((LAST_MAJOR + 1))
@@ -112,6 +107,7 @@ jobs:
           echo "bump=$BUMP_TYPE" >> $GITHUB_OUTPUT
 
       - name: Generate changelog
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: changelog
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
@@ -120,25 +116,23 @@ jobs:
           CHANGELOG+="## ${{ steps.version.outputs.version }}\n"
           CHANGELOG+="### Changes\n\n"
           
-          # Get commits since last tag
           COMMITS=$(git log --oneline $LAST_TAG..HEAD 2>/dev/null || git log --oneline -20)
           while IFS= read -r line; do
-            # Extract commit message (after commit hash)
             MSG=$(echo "$line" | sed 's/^[a-f0-9]* //')
-            # Capitalize first letter
             MSG=$(echo "$MSG" | sed 's/^./\U&/')
             CHANGELOG+="- $MSG\n"
           done <<< "$COMMITS"
           
           echo -e "$CHANGELOG" > CHANGELOG.md
-          echo "changelog_file=CHANGELOG.md" >> $GITHUB_OUTPUT
           cat CHANGELOG.md
 
       - name: Create tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git tag ${{ steps.version.outputs.version }}
 
       - name: Push tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git push origin ${{ steps.version.outputs.version }}
 
@@ -149,44 +143,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: goreleaser/goreleaser-action@v6
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish:
-    needs: release
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-
-    permissions:
-      contents: write
-      packages: write
-      pull-requests: write
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - run: git fetch --force --tags
-
-      - name: Setup Go environment
-        uses: actions/setup-go@v6
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: goreleaser/goreleaser-action@v6
+      - name: Publish Release
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
