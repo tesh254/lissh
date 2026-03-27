@@ -66,8 +66,8 @@ fi
 
 VERSION="${1:-latest}"
 if [ "$VERSION" = "latest" ]; then
-    VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name": "v\([^"]*\)".*/\1/p')
-    echo "Latest version: v$VERSION"
+    VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name": "v\([^"]*\)".*/v\1/p')
+    echo "Latest version: $VERSION"
 fi
 
 OS=$(detect_os)
