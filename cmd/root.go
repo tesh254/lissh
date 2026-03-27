@@ -12,6 +12,7 @@ import (
 	"github.com/wcrg/lissh/cmd/hosts"
 	"github.com/wcrg/lissh/cmd/keys"
 	"github.com/wcrg/lissh/cmd/update"
+	"github.com/wcrg/lissh/internal/assets"
 	"github.com/wcrg/lissh/internal/storage"
 	"github.com/wcrg/lissh/internal/version"
 )
@@ -23,15 +24,9 @@ var (
 
 func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "lissh",
-		Short: "lissh - SSH on a leash",
-		Long: `lissh keeps your SSH hosts organized and on a leash.
-
-Quickly list and search hosts, assign friendly aliases, track your
-connection history, manage SSH keys, and tweak SSH settings - all
-without manually editing config files.
-
-Run 'lissh update --check' to check for updates or 'lissh update --install' to update.`,
+		Use:                   "lissh",
+		Short:                 "SSH on a leash",
+		Long:                  assets.LOGO + "\nKeeps your SSH hosts organized and on a leash.\n\nQuickly list and search hosts, assign friendly aliases, track your\nconnection history, manage SSH keys, and tweak SSH settings - all\nwithout manually editing config files.\n\nRun 'lissh update --check' to check for updates or 'lissh update --install' to update.",
 		RunE:                  runRoot,
 		DisableAutoGenTag:     true,
 		DisableFlagsInUseLine: true,
@@ -41,11 +36,17 @@ Run 'lissh update --check' to check for updates or 'lissh update --install' to u
 	rootCmd.Flags().Int64VarP(new(int64), "id", "i", 0, "Connect to host by ID")
 	rootCmd.Flags().Bool("check-update", false, "Check for updates")
 	rootCmd.Flags().Bool("version", false, "Show version information")
+	rootCmd.Flags().Bool("logo", false, "Show logo")
 	rootCmd.SetVersionTemplate("lissh {{.Version}}\n")
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if cmd.Flags().Changed("logo") {
+			fmt.Print(assets.LOGO)
+			os.Exit(0)
+			return nil
+		}
 		if cmd.Flags().Changed("version") {
-			fmt.Printf("lissh %s\n", version.String())
+			fmt.Printf("%s lissh %s\n", assets.LOGO, version.String())
 			os.Exit(0)
 			return nil
 		}
@@ -132,6 +133,7 @@ func runRoot(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("host not found: %s", target)
 		}
 	default:
+		fmt.Print(assets.LOGO)
 		return cmd.Help()
 	}
 
