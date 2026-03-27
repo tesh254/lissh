@@ -1,9 +1,10 @@
 version: 2
 
+project_name: lissh
+
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
 builds:
   - env:
       - CGO_ENABLED=0
@@ -11,6 +12,7 @@ builds:
       - linux
       - windows
       - darwin
+    binary: lissh
 
 archives:
   - format: tar.gz
@@ -21,7 +23,6 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    # use zip for windows archives
     format_overrides:
       - goos: windows
         format: zip
@@ -39,17 +40,10 @@ changelog:
       - "^docs:"
       - "^test:"
 
-# snapcrafts:
-#   - title: go-cli-template
-#     publish: true
-#     summary: "go-cli-template"
-#     description: "go-cli-template"
-#     license: MIT
-
 dockers:
   - image_templates:
-      - "ghcr.io/emmanuelgautier/go-cli-template:{{ .Tag }}"
-      - "ghcr.io/emmanuelgautier/go-cli-template:v{{ .Major }}"
-      - "ghcr.io/emmanuelgautier/go-cli-template:v{{ .Major }}.{{ .Minor }}"
-      - "ghcr.io/emmanuelgautier/go-cli-template:latest"
+      - "ghcr.io/wcrg/lissh:{{ .Tag }}"
+      - "ghcr.io/wcrg/lissh:v{{ .Major }}"
+      - "ghcr.io/wcrg/lissh:v{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/wcrg/lissh:latest"
     dockerfile: .docker/Dockerfile-goreleaser

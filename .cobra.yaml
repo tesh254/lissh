@@ -1,2 +1,6 @@
-author: Emmanuel Gautier
-license: MIT License
+author: wcrg
+license: MIT
+
+entrypoint:
+  name: lissh
+  command: ./lissh

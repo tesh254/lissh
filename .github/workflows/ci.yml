@@ -11,7 +11,7 @@ on:
       - main
 
 env:
-  GO_VERSION: '1.25'
+  GO_VERSION: '1.25.5'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -37,6 +37,12 @@ jobs:
 
       - name: Test
         run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.out
 
   publish:
     needs: build
@@ -67,13 +73,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # https://github.com/goreleaser/goreleaser/issues/1715#issuecomment-667002748
-      # - name: Install Snapcraft
-      #   run: |
-      #     sudo snap install --classic snapcraft
-      #     mkdir -p $HOME/.cache/snapcraft/download
-      #     mkdir -p $HOME/.cache/snapcraft/stage-packages
-
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
@@ -81,4 +80,3 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
