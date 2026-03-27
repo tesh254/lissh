@@ -13,6 +13,16 @@ import (
 	"strings"
 )
 
+const (
+	keyTypeRSA     = "rsa"
+	keyTypeED25519 = "ed25519"
+	keyTypeECDSA   = "ecdsa"
+
+	pemTypeRSA     = "RSA PRIVATE KEY"
+	pemTypeED25519 = "OPENSSH PRIVATE KEY"
+	pemTypeECDSA   = "EC PRIVATE KEY"
+)
+
 type KeyMetadata struct {
 	SizeBits     *int
 	KeyType      string
@@ -40,14 +50,14 @@ func GetKeyMetadata(path string) (*KeyMetadata, error) {
 	}
 
 	switch block.Type {
-	case "RSA PRIVATE KEY":
-		metadata.KeyType = "rsa"
+	case pemTypeRSA:
+		metadata.KeyType = keyTypeRSA
 		if key, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
 			size := key.Size() * 8
 			metadata.SizeBits = &size
 		}
-	case "OPENSSH PRIVATE KEY":
-		metadata.KeyType = "ed25519"
+	case pemTypeED25519:
+		metadata.KeyType = keyTypeED25519
 		size := 256
 		metadata.SizeBits = &size
 	default:
@@ -101,15 +111,15 @@ func ParseKeyType(path string) (string, error) {
 	}
 
 	switch block.Type {
-	case "RSA PRIVATE KEY":
+	case pemTypeRSA:
 		if _, err := x509.ParsePKCS1PrivateKey(block.Bytes); err != nil {
 			return "", err
 		}
-		return "rsa", nil
-	case "OPENSSH PRIVATE KEY":
-		return "ed25519", nil
-	case "EC PRIVATE KEY":
-		return "ecdsa", nil
+		return keyTypeRSA, nil
+	case pemTypeED25519:
+		return keyTypeED25519, nil
+	case pemTypeECDSA:
+		return keyTypeECDSA, nil
 	default:
 		return strings.ToLower(block.Type), nil
 	}
@@ -127,13 +137,13 @@ func GetKeySize(path string) (int, error) {
 	}
 
 	switch block.Type {
-	case "RSA PRIVATE KEY":
+	case pemTypeRSA:
 		key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 		if err != nil {
 			return 0, err
 		}
 		return key.Size() * 8, nil
-	case "OPENSSH PRIVATE KEY":
+	case pemTypeED25519:
 		return 256, nil
 	default:
 		return 0, fmt.Errorf("unknown key type: %s", block.Type)
@@ -166,17 +176,17 @@ func ValidateKeyPair(pubPath, privPath string) (bool, error) {
 
 func GenerateFingerprint(keyType string, keyData []byte) (string, error) {
 	switch keyType {
-	case "rsa":
+	case keyTypeRSA:
 		key, err := x509.ParsePKCS1PrivateKey(keyData)
 		if err != nil {
 			return "", err
 		}
-		return fmt.Sprintf("%s %d %s", "rsa", key.Size()*8, "generated"), nil
-	case "ed25519":
+		return fmt.Sprintf("%s %d %s", keyTypeRSA, key.Size()*8, "generated"), nil
+	case keyTypeED25519:
 		if len(keyData) < 32 {
 			return "", fmt.Errorf("invalid ed25519 key data")
 		}
-		return fmt.Sprintf("%s %d %s", "ed25519", 256, "generated"), nil
+		return fmt.Sprintf("%s %d %s", keyTypeED25519, 256, "generated"), nil
 	default:
 		return "", fmt.Errorf("unsupported key type: %s", keyType)
 	}
@@ -228,7 +238,7 @@ func CreateSSHKey(keyType string, bits int, comment string) (string, string, err
 
 func CreatePublicKeyFromPrivate(pubKey interface{}, keyType, comment string) ([]byte, error) {
 	switch keyType {
-	case "rsa":
+	case keyTypeRSA:
 		cmd := exec.Command("ssh-keygen", "-y", "-t", "rsa", "-f", "/dev/null")
 		cmd.Stdin, _ = os.Open(os.DevNull)
 		return cmd.Output()

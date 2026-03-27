@@ -2,6 +2,7 @@ package history
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -161,7 +162,9 @@ func clearHistory(cmd *cobra.Command, _ []string) error {
 			fmt.Print("Clear ALL connection history? This cannot be undone. (y/N): ")
 		}
 		var response string
-		fmt.Scanln(&response)
+		if _, err := fmt.Scanln(&response); err != nil {
+			response = ""
+		}
 		if response != "y" && response != "Y" {
 			fmt.Println("Aborted")
 			return nil
@@ -176,7 +179,9 @@ func clearHistory(cmd *cobra.Command, _ []string) error {
 	} else {
 		histories, _ := historyDB.ListHistory(10000, 0)
 		for _, h := range histories {
-			historyDB.DeleteHistory(h.ID)
+			if err := historyDB.DeleteHistory(h.ID); err != nil {
+				fmt.Fprintf(os.Stderr, "Warning: failed to delete history entry %d: %v\n", h.ID, err)
+			}
 		}
 		fmt.Println("All history cleared")
 	}

@@ -293,7 +293,9 @@ func reviewHosts(cmd *cobra.Command, _ []string) error {
 
 		var response string
 		fmt.Print("Action ([a]/[n]/[k]/[i]/[s]/[q]): ")
-		fmt.Scanln(&response)
+		if _, err := fmt.Scanln(&response); err != nil {
+			response = ""
+		}
 
 		switch response {
 		case "q":

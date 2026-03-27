@@ -107,23 +107,26 @@ func parseKnownHostsLine(line string) *DiscoveredHost {
 
 	var hostname string
 	var ip string
-	var port int = 22
+	port := 22
 
-	if strings.Contains(hostPattern, "[") {
+	switch {
+	case strings.Contains(hostPattern, "["):
 		re := regexp.MustCompile(`\[([^\]]+)\]:?(\d+)?`)
 		matches := re.FindStringSubmatch(hostPattern)
 		if len(matches) >= 2 {
 			hostname = matches[1]
 			if len(matches) >= 3 && matches[2] != "" {
-				fmt.Sscanf(matches[2], "%d", &port)
+				if _, err := fmt.Sscanf(matches[2], "%d", &port); err != nil {
+					port = 22
+				}
 			}
 		}
-	} else if strings.Contains(hostPattern, ":") && net.ParseIP(hostPattern) != nil {
+	case strings.Contains(hostPattern, ":") && net.ParseIP(hostPattern) != nil:
 		ip = hostPattern
 		hostname = parts[0]
-	} else if strings.Contains(hostPattern, "@") {
+	case strings.Contains(hostPattern, "@"):
 		hostname = strings.Split(hostPattern, "@")[1]
-	} else {
+	default:
 		hostname = hostPattern
 	}
 
@@ -156,7 +159,7 @@ func (d *Discoverer) discoverSSHConfig() ([]*DiscoveredHost, error) {
 	var hosts []*DiscoveredHost
 	scanner := bufio.NewScanner(file)
 	var currentHost string
-	var port int = 22
+	port := 22
 	var ip string
 	var user string
 

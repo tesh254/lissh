@@ -445,7 +445,9 @@ func deleteKey(cmd *cobra.Command, args []string) error {
 		fmt.Printf("    Public:    %s.pub\n", key.Path)
 		fmt.Print("\n  Continue? (y/N): ")
 		var response string
-		fmt.Scanln(&response)
+		if _, err := fmt.Scanln(&response); err != nil {
+			response = ""
+		}
 		if response != "y" && response != "Y" {
 			fmt.Println(style.Dim.Render("\n  Aborted\n"))
 			return nil

@@ -169,7 +169,9 @@ func ParseHostLine(line string) (host string, port int, err error) {
 	if matches != nil {
 		host = matches[1]
 		if len(matches) >= 3 && matches[2] != "" {
-			fmt.Sscanf(matches[2], "%d", &port)
+			if _, err := fmt.Sscanf(matches[2], "%d", &port); err != nil {
+				port = 22
+			}
 		} else {
 			port = 22
 		}
@@ -179,7 +181,9 @@ func ParseHostLine(line string) (host string, port int, err error) {
 	parts := strings.Split(line, ":")
 	host = parts[0]
 	if len(parts) >= 2 {
-		fmt.Sscanf(parts[1], "%d", &port)
+		if _, err := fmt.Sscanf(parts[1], "%d", &port); err != nil {
+			port = 22
+		}
 	} else {
 		port = 22
 	}

@@ -76,7 +76,8 @@ func runRoot(cmd *cobra.Command, args []string) error {
 
 	var host *storage.Host
 
-	if cmd.Flags().Changed("id") {
+	switch {
+	case cmd.Flags().Changed("id"):
 		idVal, _ := cmd.Flags().GetInt64("id")
 		host, err = dbInit.GetHostByID(idVal)
 		if err != nil {
@@ -85,7 +86,7 @@ func runRoot(cmd *cobra.Command, args []string) error {
 		if host == nil {
 			return fmt.Errorf("host not found")
 		}
-	} else if len(args) > 0 {
+	case len(args) > 0:
 		target := args[0]
 		host, err = dbInit.GetHostByHostname(target)
 		if err != nil {
@@ -100,7 +101,7 @@ func runRoot(cmd *cobra.Command, args []string) error {
 		if host == nil {
 			return fmt.Errorf("host not found: %s", target)
 		}
-	} else {
+	default:
 		return cmd.Help()
 	}
 
@@ -153,8 +154,4 @@ func Execute() error {
 
 func NewDefaultDB() (*storage.DB, error) {
 	return storage.New("")
-}
-
-func warn(msg string) {
-	fmt.Fprintf(os.Stderr, "Warning: %s\n", msg)
 }

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -108,11 +107,12 @@ func showDiff(cmd *cobra.Command, args []string) error {
 
 	for key, value := range proposed {
 		current := cfg.Get(key)
-		if current == "" {
+		switch {
+		case current == "":
 			fmt.Printf("+ %s: %s (not set)\n", key, value)
-		} else if current != value {
+		case current != value:
 			fmt.Printf("~ %s: %s (current: %s)\n", key, value, current)
-		} else {
+		default:
 			fmt.Printf("  %s: %s (already set)\n", key, value)
 		}
 	}
@@ -135,8 +135,11 @@ func applyConfig(cmd *cobra.Command, args []string) error {
 		backupPath := configPath + ".lissh-backup-" + time.Now().Format("20060102-150405")
 		content, err := os.ReadFile(configPath)
 		if err == nil {
-			os.WriteFile(backupPath, content, 0600)
-			fmt.Printf("Backup created: %s\n", backupPath)
+			if err := os.WriteFile(backupPath, content, 0600); err != nil {
+				fmt.Fprintf(os.Stderr, "Warning: failed to create backup: %v\n", err)
+			} else {
+				fmt.Printf("Backup created: %s\n", backupPath)
+			}
 		}
 	}
 
@@ -155,7 +158,7 @@ func applyConfig(cmd *cobra.Command, args []string) error {
 	for key, value := range proposed {
 		current := sshconfig.ExtractValue(string(existingContent), key)
 		if current == "" {
-			buf.WriteString(fmt.Sprintf("%s %s\n", key, value))
+			fmt.Fprintf(&buf, "%s %s\n", key, value)
 		}
 	}
 
@@ -274,13 +277,7 @@ func applySetting(key, value string) {
 	content, _ := os.ReadFile(configPath)
 	newContent := sshconfig.SetOrUpdateValue(string(content), key, value)
 
-	os.WriteFile(configPath, []byte(newContent), 0600)
-}
-
-func runGitDiff(path string) error {
-	cmd := exec.Command("git", "diff", path)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Dir = filepath.Dir(path)
-	return cmd.Run()
+	if err := os.WriteFile(configPath, []byte(newContent), 0600); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: failed to write config: %v\n", err)
+	}
 }
