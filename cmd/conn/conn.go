@@ -80,7 +80,12 @@ func runConn(cmd *cobra.Command, args []string) error {
 		target = *host.IPAddress
 	}
 
-	fullTarget := fmt.Sprintf("%s@%s:%d", user, target, port)
+	var fullTarget string
+	if user != "" {
+		fullTarget = fmt.Sprintf("%s@%s:%d", user, target, port)
+	} else {
+		fullTarget = fmt.Sprintf("%s:%d", target, port)
+	}
 
 	session, err := connDB.StartSession(host.ID)
 	if err != nil {
@@ -115,24 +120,21 @@ func getUser(host *storage.Host) string {
 	}
 
 	if currentUser == "" {
-		fmt.Printf("  %s ", style.Warning.Render("User:"))
+		fmt.Printf("  %s (empty to use SSH default): ", style.Warning.Render("User"))
 		var user string
 		if _, err := fmt.Scanln(&user); err != nil {
-			user = "root"
-		}
-		if user == "" {
-			user = "root"
+			return ""
 		}
 		return user
 	}
 
-	fmt.Printf("  %s [%s]: ", style.Info.Render("User"), style.Bold.Render(currentUser))
+	fmt.Printf("  %s [%s] (empty to use SSH default): ", style.Info.Render("User"), style.Bold.Render(currentUser))
 	var response string
 	if _, err := fmt.Scanln(&response); err != nil {
 		return currentUser
 	}
 	if response == "" {
-		return currentUser
+		return ""
 	}
 	return response
 }
