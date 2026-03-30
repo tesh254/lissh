@@ -50,7 +50,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Latest version:  v%s\n", latestVersion)
 
-	if latestVersion.GTE(currentVersion) && currentVersion.String() != "0.0.0" {
+	if currentVersion.GTE(latestVersion) && currentVersion.String() != "0.0.0" {
 		fmt.Println("\nYou are on the latest version!")
 		return nil
 	}
