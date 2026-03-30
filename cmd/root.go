@@ -3,10 +3,10 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/spf13/cobra"
 	"github.com/wcrg/lissh/cmd/config"
+	"github.com/wcrg/lissh/cmd/conn"
 	"github.com/wcrg/lissh/cmd/discover"
 	"github.com/wcrg/lissh/cmd/history"
 	"github.com/wcrg/lissh/cmd/hosts"
@@ -27,14 +27,11 @@ func NewRootCmd() *cobra.Command {
 		Use:                   "lissh",
 		Short:                 "SSH on a leash",
 		Long:                  assets.LOGO + "\nKeeps your SSH hosts organized and on a leash.\n\nQuickly list and search hosts, assign friendly aliases, track your\nconnection history, manage SSH keys, and tweak SSH settings - all\nwithout manually editing config files.\n\nRun 'lissh update --check' to check for updates or 'lissh update --install' to update.",
-		RunE:                  runRoot,
-		Args:                  cobra.ArbitraryArgs,
 		DisableAutoGenTag:     true,
 		DisableFlagsInUseLine: true,
 	}
 
 	rootCmd.PersistentFlags().StringVar(&dbPath, "db-path", "", "Path to lissh database (default: ~/.lissh/lissh.db)")
-	rootCmd.Flags().Int64VarP(new(int64), "id", "i", 0, "Connect to host by ID")
 	rootCmd.Flags().Bool("check-update", false, "Check for updates")
 	rootCmd.Flags().Bool("version", false, "Show version information")
 	rootCmd.Flags().Bool("logo", false, "Show logo")
@@ -51,9 +48,6 @@ func NewRootCmd() *cobra.Command {
 			os.Exit(0)
 			return nil
 		}
-		if cmd.Name() == "lissh" && (len(args) > 0 || cmd.Flags().Changed("id")) {
-			return nil
-		}
 		if cmd.Flags().Changed("check-update") {
 			checkForUpdate()
 			return nil
@@ -67,6 +61,7 @@ func NewRootCmd() *cobra.Command {
 		discover.SetDB(db)
 		keys.SetDB(db)
 		history.SetDB(db)
+		conn.SetDB(db)
 		return nil
 	}
 	rootCmd.PersistentPostRunE = func(cmd *cobra.Command, args []string) error {
@@ -77,6 +72,7 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	rootCmd.AddCommand(hosts.NewHostsCmd())
+	rootCmd.AddCommand(conn.NewConnCmd())
 	rootCmd.AddCommand(discover.NewDiscoverCmd())
 	rootCmd.AddCommand(keys.NewKeysCmd())
 	rootCmd.AddCommand(history.NewHistoryCmd())
@@ -97,84 +93,6 @@ func checkForUpdate() {
 		fmt.Printf("\n  New version available: v%s\n", latestVersion)
 		fmt.Println("  Run 'lissh update --install' to update.")
 	}
-}
-
-func runRoot(cmd *cobra.Command, args []string) error {
-	dbInit, err := storage.New(dbPath)
-	if err != nil {
-		return fmt.Errorf("failed to initialize database: %w", err)
-	}
-	defer dbInit.Close()
-
-	var host *storage.Host
-
-	switch {
-	case cmd.Flags().Changed("id"):
-		idVal, _ := cmd.Flags().GetInt64("id")
-		host, err = dbInit.GetHostByID(idVal)
-		if err != nil {
-			return fmt.Errorf("failed to get host: %w", err)
-		}
-		if host == nil {
-			return fmt.Errorf("host not found")
-		}
-	case len(args) > 0:
-		target := args[0]
-		host, err = dbInit.GetHostByHostname(target)
-		if err != nil {
-			return fmt.Errorf("failed to find host: %w", err)
-		}
-		if host == nil {
-			hosts, err := dbInit.SearchHosts(target)
-			if err == nil && len(hosts) == 1 {
-				host = hosts[0]
-			}
-		}
-		if host == nil {
-			return fmt.Errorf("host not found: %s", target)
-		}
-	default:
-		fmt.Print(assets.LOGO)
-		return cmd.Help()
-	}
-
-	if host.IsInactive {
-		return fmt.Errorf("host %s is marked inactive", host.Hostname)
-	}
-
-	session, err := dbInit.StartSession(host.ID)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Warning: failed to start session tracking: %v\n", err)
-	}
-
-	target := host.Hostname
-	if host.IPAddress != nil && *host.IPAddress != "" {
-		target = *host.IPAddress
-	}
-	user := ""
-	if host.User != nil && *host.User != "" {
-		user = *host.User + "@"
-	}
-	if host.Port != 22 {
-		target = fmt.Sprintf("%s:%d", target, host.Port)
-	}
-
-	fullTarget := user + target
-
-	sshCmd := exec.Command("ssh", fullTarget)
-	sshCmd.Stdin = os.Stdin
-	sshCmd.Stdout = os.Stdout
-	sshCmd.Stderr = os.Stderr
-
-	err = sshCmd.Run()
-
-	if session != nil {
-		if endErr := dbInit.EndSession(session.ID); endErr != nil {
-			fmt.Fprintf(os.Stderr, "Warning: failed to end session tracking: %v\n", endErr)
-		}
-	}
-
-	return err
 }
 
 func Execute() error {
