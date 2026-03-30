@@ -28,6 +28,7 @@ func NewRootCmd() *cobra.Command {
 		Short:                 "SSH on a leash",
 		Long:                  assets.LOGO + "\nKeeps your SSH hosts organized and on a leash.\n\nQuickly list and search hosts, assign friendly aliases, track your\nconnection history, manage SSH keys, and tweak SSH settings - all\nwithout manually editing config files.\n\nRun 'lissh update --check' to check for updates or 'lissh update --install' to update.",
 		RunE:                  runRoot,
+		Args:                  cobra.ArbitraryArgs,
 		DisableAutoGenTag:     true,
 		DisableFlagsInUseLine: true,
 	}
