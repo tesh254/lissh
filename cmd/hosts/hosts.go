@@ -54,6 +54,7 @@ func NewHostsCmd() *cobra.Command {
 	editCmd.Flags().String("notes", "", "Set host notes")
 	editCmd.Flags().Int64("key-id", 0, "Associate SSH key ID")
 	editCmd.Flags().Int("port", 0, "Set port")
+	editCmd.Flags().String("user", "", "Set SSH user")
 
 	connectCmd := &cobra.Command{
 		Use:   "connect [id]",
@@ -330,21 +331,25 @@ func editHost(cmd *cobra.Command, args []string) error {
 	notes, _ := cmd.Flags().GetString("notes")
 	sshKeyID, _ := cmd.Flags().GetInt64("key-id")
 	port, _ := cmd.Flags().GetInt("port")
+	user, _ := cmd.Flags().GetString("user")
 
-	var aliasPtr, notesPtr *string
+	var aliasPtr, notesPtr, userPtr *string
 	if cmd.Flags().Changed("alias") {
 		aliasPtr = &alias
 	}
 	if cmd.Flags().Changed("notes") {
 		notesPtr = &notes
 	}
+	if cmd.Flags().Changed("user") {
+		userPtr = &user
+	}
 	var sshKeyPtr *int64
 	if cmd.Flags().Changed("key-id") {
 		sshKeyPtr = &sshKeyID
 	}
 
-	if aliasPtr == nil && notesPtr == nil && sshKeyPtr == nil && !cmd.Flags().Changed("port") {
-		return fmt.Errorf("no changes specified (use --alias, --notes, --key-id, or --port)")
+	if aliasPtr == nil && notesPtr == nil && sshKeyPtr == nil && userPtr == nil && !cmd.Flags().Changed("port") {
+		return fmt.Errorf("no changes specified (use --alias, --notes, --key-id, --port, or --user)")
 	}
 
 	if cmd.Flags().Changed("port") {
@@ -353,7 +358,7 @@ func editHost(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if err := hostsDB.UpdateHost(id, aliasPtr, notesPtr, sshKeyPtr, nil); err != nil {
+	if err := hostsDB.UpdateHost(id, aliasPtr, notesPtr, sshKeyPtr, userPtr); err != nil {
 		return fmt.Errorf("failed to update host: %w", err)
 	}
 
