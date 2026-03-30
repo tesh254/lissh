@@ -117,7 +117,9 @@ func getUser(host *storage.Host) string {
 	if currentUser == "" {
 		fmt.Printf("  %s ", style.Warning.Render("User:"))
 		var user string
-		fmt.Scanln(&user)
+		if _, err := fmt.Scanln(&user); err != nil {
+			user = "root"
+		}
 		if user == "" {
 			user = "root"
 		}
@@ -126,7 +128,9 @@ func getUser(host *storage.Host) string {
 
 	fmt.Printf("  %s [%s]: ", style.Info.Render("User"), style.Bold.Render(currentUser))
 	var response string
-	fmt.Scanln(&response)
+	if _, err := fmt.Scanln(&response); err != nil {
+		return currentUser
+	}
 	if response == "" {
 		return currentUser
 	}
@@ -141,7 +145,9 @@ func getPort(host *storage.Host) int {
 
 	fmt.Printf("  %s [%d]: ", style.Info.Render("Port"), currentPort)
 	var response string
-	fmt.Scanln(&response)
+	if _, err := fmt.Scanln(&response); err != nil {
+		return currentPort
+	}
 	if response == "" {
 		return currentPort
 	}
