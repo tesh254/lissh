@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -90,6 +89,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
+	defer os.RemoveAll(tmpDir)
 
 	filename, err := downloadVersion(latestVersion, tmpDir)
 	if err != nil {
@@ -102,37 +102,19 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 	}
 
 	newPath := installPath + ".new"
-	if err := copyFile(newBinaryPath, newPath); err != nil {
+
+	if err := os.Rename(newBinaryPath, newPath); err != nil {
 		return fmt.Errorf("failed to prepare update: %w", err)
 	}
 
-	binDir := filepath.Dir(installPath)
-	helperPath := filepath.Join(binDir, ".lissh_update_helper")
-	helperScript := fmt.Sprintf(`#!/bin/bash
-sleep 0.5
-rm -f '%s'
-mv '%s' '%s'
-chmod 755 '%s'
-rm -rf '%s'
-rm -f '%s'
-`, installPath, newPath, installPath, installPath, tmpDir, helperPath)
+	fmt.Printf("Installing to: %s\n", installPath)
 
-	if err := os.WriteFile(helperPath, []byte(helperScript), 0755); err != nil { //nolint:gosec // helper script needs to be executable
-		os.Remove(newPath)
-		return fmt.Errorf("failed to create helper: %w", err)
-	}
-
-	c := exec.Command(helperPath)
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
-	c.Stdin = os.Stdin
-	if err := c.Start(); err != nil {
-		os.Remove(newPath)
-		return fmt.Errorf("failed to start helper: %w", err)
+	if err := os.Rename(newPath, installPath); err != nil {
+		return fmt.Errorf("failed to install update: %w (try running with sudo or reinstall manually)", err)
 	}
 
 	fmt.Printf("\nSuccessfully updated to v%s!\n", latestVersion)
-	fmt.Println("Run 'lissh --version' to verify.")
+	fmt.Println("Restart lissh to use the new version.")
 
 	return nil
 }
@@ -172,25 +154,4 @@ func downloadVersion(v semver.Version, tmpDir string) (string, error) {
 	}
 
 	return filename, nil
-}
-
-func copyFile(src, dst string) error {
-	srcFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
-	_, err = io.Copy(dstFile, srcFile)
-	if err != nil {
-		return err
-	}
-
-	return dstFile.Sync()
 }
