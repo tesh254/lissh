@@ -5,10 +5,10 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/blang/semver/v4"
 	"github.com/spf13/cobra"
@@ -106,34 +106,27 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to prepare update: %w", err)
 	}
 
-	binDir := filepath.Dir(installPath)
-	helperPath := filepath.Join(binDir, ".lissh_update_helper")
-
 	helperScript := fmt.Sprintf(`#!/bin/bash
 sleep 0.5
 rm -f '%s'
 mv '%s' '%s'
 chmod 755 '%s'
 rm -f '%s'
-exec '%s'
-`, installPath, newPath, installPath, installPath, helperPath, installPath)
+`, installPath, newPath, installPath, installPath, tmpDir)
 
-	if err := os.WriteFile(helperPath, []byte(helperScript), 0755); err != nil { //nolint:gosec // helper script needs to be executable
+	helperPath := filepath.Join(tmpDir, "lissh_update_helper")
+	if err := os.WriteFile(helperPath, []byte(helperScript), 0755); err != nil {
 		os.Remove(newPath)
 		return fmt.Errorf("failed to create helper: %w", err)
 	}
 
-	procAttr := &syscall.ProcAttr{
-		Dir: binDir,
-		Env: os.Environ(),
-		Sys: &syscall.SysProcAttr{Setsid: true},
-	}
-
-	_, err = syscall.ForkExec(helperPath, []string{"lissh-update-helper"}, procAttr)
-	if err != nil {
+	c := exec.Command(helperPath)
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Stdin = os.Stdin
+	if err := c.Start(); err != nil {
 		os.Remove(newPath)
-		os.Remove(helperPath)
-		return fmt.Errorf("failed to start update helper: %w", err)
+		return fmt.Errorf("failed to start helper: %w", err)
 	}
 
 	fmt.Printf("\nSuccessfully updated to v%s!\n", latestVersion)
