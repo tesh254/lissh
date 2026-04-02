@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wcrg/lissh/cmd/actions"
+	"github.com/wcrg/lissh/cmd/completion"
 	"github.com/wcrg/lissh/cmd/config"
 	"github.com/wcrg/lissh/cmd/conn"
 	"github.com/wcrg/lissh/cmd/discover"
@@ -81,6 +82,8 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.AddCommand(config.NewConfigCmd())
 	rootCmd.AddCommand(update.NewUpdateCmd())
 	rootCmd.AddCommand(actions.NewActionsCmd())
+	completion.SetRootCmd(rootCmd)
+	rootCmd.AddCommand(completion.NewCompletionCmd(rootCmd))
 
 	return rootCmd
 }
