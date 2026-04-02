@@ -118,7 +118,7 @@ rm -f '%s'
 exec '%s'
 `, installPath, newPath, installPath, installPath, helperPath, installPath)
 
-	if err := os.WriteFile(helperPath, []byte(helperScript), 0755); err != nil {
+	if err := os.WriteFile(helperPath, []byte(helperScript), 0755); err != nil { //nolint:gosec // helper script needs to be executable
 		os.Remove(newPath)
 		return fmt.Errorf("failed to create helper: %w", err)
 	}
