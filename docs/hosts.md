@@ -51,6 +51,7 @@ lissh hosts edit <id> [flags]
 | `--notes` | Add notes or labels |
 | `--key-id` | Associate an SSH key |
 | `--port` | Set custom port |
+| `--user` | Set SSH user |
 
 **Examples:**
 
@@ -66,6 +67,9 @@ lissh hosts edit 16 --key-id=1
 
 # Change port
 lissh hosts edit 16 --port=2222
+
+# Set SSH user
+lissh hosts edit 16 --user=ubuntu
 ```
 
 ### connect

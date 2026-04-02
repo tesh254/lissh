@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -48,7 +47,7 @@ func NewActionsCmd() *cobra.Command {
 	addCmd.Flags().String("description", "", "Action description")
 	addCmd.Flags().String("command", "", "Command template to execute")
 	addCmd.Flags().String("host-alias", "", "Comma-separated host aliases to bind (e.g., sigma-dev,sigma-beta)")
-	addCmd.MarkFlagRequired("command")
+	_ = addCmd.MarkFlagRequired("command")
 
 	editCmd := &cobra.Command{
 		Use:   "edit [name]",
@@ -469,11 +468,4 @@ func truncate(s string, maxLen int) string {
 		return s[:maxLen-2] + ".."
 	}
 	return s
-}
-
-func readInput(prompt string) string {
-	fmt.Print(prompt)
-	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
-	return strings.TrimSpace(input)
 }

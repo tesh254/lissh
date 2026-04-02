@@ -41,7 +41,7 @@ func (db *DB) CreateAction(input CreateActionInput) (*Action, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	result, err := tx.Exec(`
 		INSERT INTO actions (name, description, command)
@@ -229,7 +229,7 @@ func (db *DB) UpdateAction(id int64, input UpdateActionInput) error {
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	query := `UPDATE actions SET updated_at = CURRENT_TIMESTAMP`
 	args := []interface{}{}
