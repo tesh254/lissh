@@ -149,7 +149,7 @@ func installBashCompletion() (string, error) {
 		return "", fmt.Errorf("failed to generate completion: %w", err)
 	}
 
-	if err := os.WriteFile(completionPath, []byte(buf.String()), 0644); err != nil {
+	if err := os.WriteFile(completionPath, []byte(buf.String()), 0644); err != nil { //nolint:gosec // completion files need to be readable
 		return "", fmt.Errorf("failed to write completion file: %w", err)
 	}
 
@@ -182,7 +182,7 @@ func installZshCompletion() (string, error) {
 		return "", fmt.Errorf("failed to generate completion: %w", err)
 	}
 
-	if err := os.WriteFile(completionPath, []byte(buf.String()), 0644); err != nil {
+	if err := os.WriteFile(completionPath, []byte(buf.String()), 0644); err != nil { //nolint:gosec // completion files need to be readable
 		return "", fmt.Errorf("failed to write completion file: %w", err)
 	}
 
@@ -210,7 +210,7 @@ func installFishCompletion() (string, error) {
 		}
 	}
 
-	completionDir := filepath.Join(configHome, "completions")
+	completionDir := filepath.Join(filepath.Clean(configHome), "completions")
 	if err := os.MkdirAll(completionDir, 0755); err != nil {
 		return "", fmt.Errorf("failed to create directory: %w", err)
 	}
@@ -222,7 +222,7 @@ func installFishCompletion() (string, error) {
 		return "", fmt.Errorf("failed to generate completion: %w", err)
 	}
 
-	if err := os.WriteFile(completionPath, []byte(buf.String()), 0644); err != nil {
+	if err := os.WriteFile(completionPath, []byte(buf.String()), 0644); err != nil { //nolint:gosec // completion files need to be readable
 		return "", fmt.Errorf("failed to write completion file: %w", err)
 	}
 
@@ -249,7 +249,7 @@ func installPowerShellCompletion() (string, error) {
 		return "", fmt.Errorf("failed to generate completion: %w", err)
 	}
 
-	if err := os.WriteFile(completionPath, []byte(buf.String()), 0644); err != nil {
+	if err := os.WriteFile(completionPath, []byte(buf.String()), 0644); err != nil { //nolint:gosec // completion files need to be readable
 		return "", fmt.Errorf("failed to write completion file: %w", err)
 	}
 
