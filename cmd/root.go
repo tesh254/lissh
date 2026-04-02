@@ -40,13 +40,18 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.SetVersionTemplate("lissh {{.Version}}\n")
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
-		if cmd.Flags().Changed("logo") {
+		if cmd.HasParent() && cmd.Parent().Name() == "completion" {
+			// Don't show logo for completion subcommands
+		} else {
 			fmt.Print(assets.LOGO)
+		}
+
+		if cmd.Flags().Changed("logo") {
 			os.Exit(0)
 			return nil
 		}
 		if cmd.Flags().Changed("version") {
-			fmt.Printf("%s lissh %s\n", assets.LOGO, version.String())
+			fmt.Printf("lissh %s\n", version.String())
 			os.Exit(0)
 			return nil
 		}
