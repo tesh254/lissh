@@ -103,7 +103,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Installing to: %s\n", installPath)
 
-	if err := os.Rename(binaryPath, installPath); err != nil {
+	if err := copyFile(binaryPath, installPath); err != nil {
 		return fmt.Errorf("failed to replace binary: %w (try running with sudo)", err)
 	}
 
@@ -148,4 +148,25 @@ func downloadVersion(v semver.Version, tmpDir string) (string, error) {
 	}
 
 	return filename, nil
+}
+
+func copyFile(src, dst string) error {
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	dstFile, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	_, err = io.Copy(dstFile, srcFile)
+	if err != nil {
+		return err
+	}
+
+	return dstFile.Sync()
 }
