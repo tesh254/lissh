@@ -33,6 +33,8 @@ type CreateHostInput struct {
 	Notes     *string
 }
 
+const whereIDClause = ` WHERE id = ?`
+
 func (db *DB) CreateHost(input CreateHostInput) (*Host, error) {
 	result, err := db.conn.Exec(`
 		INSERT INTO hosts (hostname, alias, ip_address, user, port, source, ssh_key_id, notes)
@@ -247,7 +249,7 @@ func (db *DB) UpdateHost(id int64, alias *string, notes *string, sshKeyID *int64
 		args = append(args, *user)
 	}
 
-	query += ` WHERE id = ?`
+	query += whereIDClause
 	args = append(args, id)
 
 	_, err := db.conn.Exec(query, args...)
