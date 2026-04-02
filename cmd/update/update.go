@@ -106,15 +106,17 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to prepare update: %w", err)
 	}
 
+	binDir := filepath.Dir(installPath)
+	helperPath := filepath.Join(binDir, ".lissh_update_helper")
 	helperScript := fmt.Sprintf(`#!/bin/bash
 sleep 0.5
 rm -f '%s'
 mv '%s' '%s'
 chmod 755 '%s'
+rm -rf '%s'
 rm -f '%s'
-`, installPath, newPath, installPath, installPath, tmpDir)
+`, installPath, newPath, installPath, installPath, tmpDir, helperPath)
 
-	helperPath := filepath.Join(tmpDir, "lissh_update_helper")
 	if err := os.WriteFile(helperPath, []byte(helperScript), 0755); err != nil { //nolint:gosec // helper script needs to be executable
 		os.Remove(newPath)
 		return fmt.Errorf("failed to create helper: %w", err)
