@@ -109,7 +109,38 @@ func (db *DB) migrate() error {
 		return fmt.Errorf("failed to add user column: %w", err)
 	}
 
+	if err := db.addActionsTableIfNotExists(); err != nil {
+		return fmt.Errorf("failed to add actions table: %w", err)
+	}
+
 	return nil
+}
+
+func (db *DB) addActionsTableIfNotExists() error {
+	_, err := db.conn.Exec(`
+		CREATE TABLE IF NOT EXISTS actions (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			name TEXT NOT NULL UNIQUE,
+			description TEXT,
+			command TEXT NOT NULL,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		)
+	`)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.conn.Exec(`
+		CREATE TABLE IF NOT EXISTS action_hosts (
+			action_id INTEGER NOT NULL,
+			host_id INTEGER NOT NULL,
+			PRIMARY KEY (action_id, host_id),
+			FOREIGN KEY (action_id) REFERENCES actions(id) ON DELETE CASCADE,
+			FOREIGN KEY (host_id) REFERENCES hosts(id) ON DELETE CASCADE
+		)
+	`)
+	return err
 }
 
 func (db *DB) addUserColumnIfNotExists() error {

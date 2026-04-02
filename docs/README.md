@@ -36,6 +36,7 @@ lissh keys scan
 - [keys](./keys.md) - Manage SSH keys
 - [history](./history.md) - View connection history
 - [config](./config.md) - SSH config helpers
+- [actions](./actions.md) - Manage and run remote actions on hosts
 
 ## Database Location
 

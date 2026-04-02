@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/wcrg/lissh/cmd/actions"
 	"github.com/wcrg/lissh/cmd/config"
 	"github.com/wcrg/lissh/cmd/conn"
 	"github.com/wcrg/lissh/cmd/discover"
@@ -62,6 +63,7 @@ func NewRootCmd() *cobra.Command {
 		keys.SetDB(db)
 		history.SetDB(db)
 		conn.SetDB(db)
+		actions.SetDB(db)
 		return nil
 	}
 	rootCmd.PersistentPostRunE = func(cmd *cobra.Command, args []string) error {
@@ -78,6 +80,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.AddCommand(history.NewHistoryCmd())
 	rootCmd.AddCommand(config.NewConfigCmd())
 	rootCmd.AddCommand(update.NewUpdateCmd())
+	rootCmd.AddCommand(actions.NewActionsCmd())
 
 	return rootCmd
 }
