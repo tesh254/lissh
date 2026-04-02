@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/blang/semver/v4"
 	"github.com/spf13/cobra"
@@ -89,26 +90,54 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
-	defer os.RemoveAll(tmpDir)
 
 	filename, err := downloadVersion(latestVersion, tmpDir)
 	if err != nil {
 		return fmt.Errorf("failed to download update: %w", err)
 	}
 
-	binaryPath := filepath.Join(tmpDir, filename)
-	if err := os.Chmod(binaryPath, 0755); err != nil {
+	newBinaryPath := filepath.Join(tmpDir, filename)
+	if err := os.Chmod(newBinaryPath, 0755); err != nil {
 		return fmt.Errorf("failed to set permissions: %w", err)
 	}
 
-	fmt.Printf("Installing to: %s\n", installPath)
+	newPath := installPath + ".new"
+	if err := copyFile(newBinaryPath, newPath); err != nil {
+		return fmt.Errorf("failed to prepare update: %w", err)
+	}
 
-	if err := copyFile(binaryPath, installPath); err != nil {
-		return fmt.Errorf("failed to replace binary: %w (try running with sudo)", err)
+	binDir := filepath.Dir(installPath)
+	helperPath := filepath.Join(binDir, ".lissh_update_helper")
+
+	helperScript := fmt.Sprintf(`#!/bin/bash
+sleep 0.5
+rm -f '%s'
+mv '%s' '%s'
+chmod 755 '%s'
+rm -f '%s'
+exec '%s'
+`, installPath, newPath, installPath, installPath, helperPath, installPath)
+
+	if err := os.WriteFile(helperPath, []byte(helperScript), 0755); err != nil {
+		os.Remove(newPath)
+		return fmt.Errorf("failed to create helper: %w", err)
+	}
+
+	procAttr := &syscall.ProcAttr{
+		Dir: binDir,
+		Env: os.Environ(),
+		Sys: &syscall.SysProcAttr{Setsid: true},
+	}
+
+	_, err = syscall.ForkExec(helperPath, []string{"lissh-update-helper"}, procAttr)
+	if err != nil {
+		os.Remove(newPath)
+		os.Remove(helperPath)
+		return fmt.Errorf("failed to start update helper: %w", err)
 	}
 
 	fmt.Printf("\nSuccessfully updated to v%s!\n", latestVersion)
-	fmt.Printf("Run 'lissh --version' to verify.\n")
+	fmt.Println("Run 'lissh --version' to verify.")
 
 	return nil
 }
@@ -157,7 +186,7 @@ func copyFile(src, dst string) error {
 	}
 	defer srcFile.Close()
 
-	dstFile, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	dstFile, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
