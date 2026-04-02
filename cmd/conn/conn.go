@@ -23,6 +23,8 @@ func NewConnCmd() *cobra.Command {
 	}
 
 	cmd.Flags().Int64P("id", "i", 0, "Connect to host by ID")
+	cmd.Flags().BoolP("yes", "y", false, "Skip prompts and connect directly")
+	cmd.Flags().BoolP("verbose", "v", false, "Enable verbose SSH output")
 
 	return cmd
 }
@@ -35,6 +37,9 @@ func runConn(cmd *cobra.Command, args []string) error {
 	if connDB == nil {
 		return fmt.Errorf("database not initialized")
 	}
+
+	skipPrompts, _ := cmd.Flags().GetBool("yes")
+	verbose, _ := cmd.Flags().GetBool("verbose")
 
 	var host *storage.Host
 	var err error
@@ -72,19 +77,24 @@ func runConn(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("host %s is marked inactive", host.Hostname)
 	}
 
-	user := getUser(host)
-	port := getPort(host)
+	user := ""
+	port := 22
+
+	if skipPrompts {
+		if host.User != nil && *host.User != "" {
+			user = *host.User
+		}
+		if host.Port != 0 {
+			port = host.Port
+		}
+	} else {
+		user = getUser(host)
+		port = getPort(host)
+	}
 
 	target := host.Hostname
 	if host.IPAddress != nil && *host.IPAddress != "" {
 		target = *host.IPAddress
-	}
-
-	var fullTarget string
-	if user != "" {
-		fullTarget = fmt.Sprintf("%s@%s:%d", user, target, port)
-	} else {
-		fullTarget = fmt.Sprintf("%s:%d", target, port)
 	}
 
 	session, err := connDB.StartSession(host.ID)
@@ -92,7 +102,13 @@ func runConn(cmd *cobra.Command, args []string) error {
 		fmt.Fprintf(os.Stderr, "Warning: failed to start session tracking: %v\n", err)
 	}
 
-	sshCmd := exec.Command("ssh", fullTarget)
+	sshArgs := buildSSHArgs(user, target, port, verbose)
+
+	if verbose {
+		fmt.Printf("  %s ssh %s\n", style.Info.Render("Running:"), sshArgs)
+	}
+
+	sshCmd := exec.Command("ssh", sshArgs...)
 	sshCmd.Stdin = os.Stdin
 	sshCmd.Stdout = os.Stdout
 	sshCmd.Stderr = os.Stderr
@@ -106,6 +122,26 @@ func runConn(cmd *cobra.Command, args []string) error {
 	}
 
 	return err
+}
+
+func buildSSHArgs(user, target string, port int, verbose bool) []string {
+	var args []string
+
+	if verbose {
+		args = append(args, "-v")
+	}
+
+	if user != "" {
+		args = append(args, user+"@"+target)
+	} else {
+		args = append(args, target)
+	}
+
+	if port != 22 {
+		args = append(args, "-p", strconv.Itoa(port))
+	}
+
+	return args
 }
 
 func getUser(host *storage.Host) string {
