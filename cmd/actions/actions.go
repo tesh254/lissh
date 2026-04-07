@@ -74,7 +74,8 @@ func NewActionsCmd() *cobra.Command {
 		RunE:  runAction,
 	}
 	runCmd.Flags().StringSlice("set", nil, "Set variable values (e.g., --set container=sigma_merl)")
-	runCmd.Flags().String("host-alias", "", "Override host to run on (instead of bound hosts)")
+	runCmd.Flags().String("host-alias", "", "Run on specific host (must be bound to action)")
+	runCmd.Flags().String("alias", "", "Alias of bound host to run on")
 
 	cmd.AddCommand(listCmd, infoCmd, addCmd, editCmd, deleteCmd, runCmd)
 
@@ -326,6 +327,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 	name := args[0]
 	setVars, _ := cmd.Flags().GetStringSlice("set")
 	overrideHost, _ := cmd.Flags().GetString("host-alias")
+	alias, _ := cmd.Flags().GetString("alias")
 
 	action, err := actionsDB.GetActionByName(name)
 	if err != nil {
@@ -368,7 +370,26 @@ func runAction(cmd *cobra.Command, args []string) error {
 
 	var hosts []*storage.Host
 
-	if overrideHost != "" {
+	if alias != "" {
+		if len(action.Hosts) == 0 {
+			return fmt.Errorf("action %s has no bound hosts", name)
+		}
+		found := false
+		for _, h := range action.Hosts {
+			hostAlias := h.Hostname
+			if h.Alias != nil && *h.Alias != "" {
+				hostAlias = *h.Alias
+			}
+			if hostAlias == alias {
+				hosts = []*storage.Host{h}
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf("host %s is not bound to action %s", alias, name)
+		}
+	} else if overrideHost != "" {
 		host, err := actionsDB.GetHostByHostname(overrideHost)
 		if err != nil {
 			return fmt.Errorf("failed to find host: %w", err)

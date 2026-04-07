@@ -48,7 +48,7 @@ lissh actions add <name> [flags]
 # Create an action with bound hosts
 lissh actions add logs \
   --description "Stream docker logs" \
-  --command 'for id in $(docker ps --filter "name=${container}" --format "{{{{.ID}}}}"); do docker logs -f "$id" & done; wait' \
+  --command 'for id in $(docker ps --filter "name=${container}" --format "{{.ID}}"); do docker logs -f "$id" & done; wait' \
   --host-alias sigma-dev,sigma-beta
 
 # Create an unbound action (run on any host with --host-alias)
@@ -108,7 +108,8 @@ lissh actions run <name> [flags]
 | Flag | Description |
 |------|-------------|
 | `--set` | Set variable values (e.g., `--set container=myapp`) |
-| `--host-alias` | Override host to run on (instead of bound hosts) |
+| `--host-alias` | Run on specific host (must be bound to action) |
+| `--alias` | Alias of bound host to run on (stricter than --host-alias) |
 
 **Variable Substitution:**
 
@@ -123,10 +124,10 @@ lissh actions run logs --set container=sigma_merl
 # Run (will prompt for ${container} value)
 lissh actions run logs
 
-# Run on a different host (overrides bound hosts)
-lissh actions run logs --host-alias production-server --set container=api
+# Run on a specific bound host
+lissh actions run logs --alias sigma-beta --set container=api
 
-# Run on unbound host
+# Run on unbound host (use --host-alias)
 lissh actions run check-memory --host-alias webserver
 ```
 
@@ -153,7 +154,7 @@ When a variable is not provided via `--set`, you will be prompted to enter a val
 ```bash
 lissh actions add docker-logs \
   --description "Stream docker container logs" \
-  --command 'for id in $(docker ps --filter "name=${container}" --format "{{{{.ID}}}}"); do docker logs -f "$id" & done; wait' \
+  --command 'for id in $(docker ps --filter "name=${container}" --format "{{.ID}}"); do docker logs -f "$id" & done; wait' \
   --host-alias sigma-dev,sigma-beta
 
 # Run
