@@ -19,6 +19,8 @@ import (
 	"github.com/wcrg/lissh/internal/version"
 )
 
+var logoShown bool
+
 var (
 	db     *storage.DB
 	dbPath string
@@ -28,30 +30,27 @@ func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:                   "lissh",
 		Short:                 "SSH on a leash",
-		Long:                  assets.LOGO + "\nKeeps your SSH hosts organized and on a leash.\n\nQuickly list and search hosts, assign friendly aliases, track your\nconnection history, manage SSH keys, and tweak SSH settings - all\nwithout manually editing config files.\n\nRun 'lissh update --check' to check for updates or 'lissh update --install' to update.",
+		Long:                  "Keeps your SSH hosts organized and on a leash.\n\nQuickly list and search hosts, assign friendly aliases, track your\nconnection history, manage SSH keys, and tweak SSH settings - all\nwithout manually editing config files.\n\nRun 'lissh update --check' to check for updates or 'lissh update --install' to update.",
 		DisableAutoGenTag:     true,
 		DisableFlagsInUseLine: true,
+		Version:               version.String(),
 	}
 
 	rootCmd.PersistentFlags().StringVar(&dbPath, "db-path", "", "Path to lissh database (default: ~/.lissh/lissh.db)")
 	rootCmd.Flags().Bool("check-update", false, "Check for updates")
-	rootCmd.Flags().Bool("version", false, "Show version information")
 	rootCmd.Flags().Bool("logo", false, "Show logo")
-	rootCmd.SetVersionTemplate("lissh {{.Version}}\n")
+
+	rootCmd.SetVersionTemplate(assets.LOGO + "lissh {{.Version}}\n")
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		if cmd.HasParent() && cmd.Parent().Name() == "completion" {
 			// Don't show logo for completion subcommands
 		} else {
 			fmt.Print(assets.LOGO)
+			logoShown = true
 		}
 
 		if cmd.Flags().Changed("logo") {
-			os.Exit(0)
-			return nil
-		}
-		if cmd.Flags().Changed("version") {
-			fmt.Printf("lissh %s\n", version.String())
 			os.Exit(0)
 			return nil
 		}
