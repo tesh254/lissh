@@ -19,8 +19,6 @@ import (
 	"github.com/wcrg/lissh/internal/version"
 )
 
-var logoShown bool
-
 var (
 	db     *storage.DB
 	dbPath string
@@ -47,7 +45,6 @@ func NewRootCmd() *cobra.Command {
 			// Don't show logo for completion subcommands
 		} else {
 			fmt.Print(assets.LOGO)
-			logoShown = true
 		}
 
 		if cmd.Flags().Changed("logo") {
