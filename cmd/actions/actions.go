@@ -370,7 +370,8 @@ func runAction(cmd *cobra.Command, args []string) error {
 
 	var hosts []*storage.Host
 
-	if alias != "" {
+	switch {
+	case alias != "":
 		if len(action.Hosts) == 0 {
 			return fmt.Errorf("action %s has no bound hosts", name)
 		}
@@ -389,7 +390,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 		if !found {
 			return fmt.Errorf("host %s is not bound to action %s", alias, name)
 		}
-	} else if overrideHost != "" {
+	case overrideHost != "":
 		host, err := actionsDB.GetHostByHostname(overrideHost)
 		if err != nil {
 			return fmt.Errorf("failed to find host: %w", err)
@@ -398,7 +399,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("host not found: %s", overrideHost)
 		}
 		hosts = []*storage.Host{host}
-	} else {
+	default:
 		hosts = action.Hosts
 	}
 
