@@ -71,7 +71,8 @@ lissh actions edit <name> [flags]
 |------|-------------|
 | `--command` | Updated command template |
 | `--description` | Updated description |
-| `--host-alias` | Updated comma-separated host aliases |
+| `--host-alias` | Comma-separated host aliases (replaces existing) |
+| `--add-host` | Comma-separated host aliases to add (appends to existing) |
 
 **Examples:**
 
@@ -79,8 +80,11 @@ lissh actions edit <name> [flags]
 # Update the command
 lissh actions edit logs --command 'docker logs -f ${container}'
 
-# Update bound hosts
+# Replace all bound hosts
 lissh actions edit logs --host-alias sigma-dev,sigma-beta,production
+
+# Add new hosts to existing bound hosts
+lissh actions edit logs --add-host sigma-beta,new-server
 
 # Update description
 lissh actions edit logs --description "Stream container logs"

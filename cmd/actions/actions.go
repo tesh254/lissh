@@ -57,7 +57,8 @@ func NewActionsCmd() *cobra.Command {
 	}
 	editCmd.Flags().String("description", "", "Action description")
 	editCmd.Flags().String("command", "", "Command template to execute")
-	editCmd.Flags().String("host-alias", "", "Comma-separated host aliases to bind (e.g., sigma-dev,sigma-beta)")
+	editCmd.Flags().String("host-alias", "", "Comma-separated host aliases to bind (replaces existing)")
+	editCmd.Flags().String("add-host", "", "Comma-separated host aliases to add (appends to existing)")
 
 	deleteCmd := &cobra.Command{
 		Use:   "delete [name]",
@@ -267,6 +268,23 @@ func editAction(cmd *cobra.Command, args []string) error {
 			}
 		}
 		hostAliases = &aliases
+	} else if cmd.Flags().Changed("add-host") {
+		addHostStr, _ := cmd.Flags().GetString("add-host")
+		currentAliases := []string{}
+		for _, h := range action.Hosts {
+			if h.Alias != nil && *h.Alias != "" {
+				currentAliases = append(currentAliases, *h.Alias)
+			} else {
+				currentAliases = append(currentAliases, h.Hostname)
+			}
+		}
+		for _, alias := range strings.Split(addHostStr, ",") {
+			alias = strings.TrimSpace(alias)
+			if alias != "" {
+				currentAliases = append(currentAliases, alias)
+			}
+		}
+		hostAliases = &currentAliases
 	}
 
 	input := storage.UpdateActionInput{
