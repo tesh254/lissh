@@ -1,47 +1,12 @@
-# lissh - SSH on a Leash
+# lissh Documentation
 
-A CLI tool for managing SSH hosts, aliases, keys, and connection history.
+This directory contains the source for the [lissh GitHub Pages site](https://wcrg.github.io/lissh/).
 
-## Quick Start
+## Links
 
-```bash
-# Connect to a host by alias or hostname
-lissh webserver
-lissh 192.168.1.100
+- **Live Documentation**: https://wcrg.github.io/lissh/
+- **Source Code**: https://github.com/wcrg/lissh
 
-# Connect to a host by ID
-lissh -i 16
+## Development
 
-# List all hosts
-lissh hosts list
-
-# Discover hosts from known_hosts and SSH config
-lissh discover run
-
-# Scan for SSH keys
-lissh keys scan
-```
-
-## Global Flags
-
-| Flag | Short | Description | Default |
-|------|-------|-------------|---------|
-| `--db-path` | | Path to lissh database | `~/.lissh/lissh.db` |
-| `--id` | `-i` | Connect to host by ID | |
-
-## Commands
-
-- [hosts](./hosts.md) - List, search, edit, and connect to hosts
-- [discover](./discover.md) - Discover hosts from known_hosts and SSH config
-- [keys](./keys.md) - Manage SSH keys
-- [history](./history.md) - View connection history
-- [config](./config.md) - SSH config helpers
-- [actions](./actions.md) - Manage and run remote actions on hosts
-
-## Database Location
-
-By default, lissh stores its SQLite database at `~/.lissh/lissh.db`. You can specify a different location with the `--db-path` flag:
-
-```bash
-lissh --db-path=/custom/path/lissh.db hosts list
-```
+The HTML pages are generated from markdown documentation in the parent repository. To update documentation, edit the corresponding HTML files directly for the GitHub Pages site.

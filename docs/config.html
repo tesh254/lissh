@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>config - lissh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --sidebar-bg: #f6f8fa;
+            --border-color: #d0d7de;
+            --text-color: #24292f;
+            --link-color: #0969da;
+            --code-bg: #f6f8fa;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0d1117;
+                --sidebar-bg: #161b22;
+                --border-color: #30363d;
+                --text-color: #c9d1d9;
+                --link-color: #58a6ff;
+                --code-bg: #161b22;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-logo { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: var(--text-color); }
+        .sidebar-logo span { color: #0969da; }
+        .sidebar-tagline { font-size: 14px; color: #656d76; margin-bottom: 24px; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #656d76; margin-bottom: 8px; }
+        .nav-list { list-style: none; }
+        .nav-list li { margin-bottom: 4px; }
+        .nav-list a { display: block; padding: 6px 12px; border-radius: 6px; color: var(--text-color); text-decoration: none; font-size: 14px; }
+        .nav-list a:hover { background: var(--border-color); }
+        .nav-list a.active { background: #ddf4ff; color: var(--link-color); }
+        .main { flex: 1; margin-left: 280px; padding: 48px; max-width: 900px; }
+        h1 { font-size: 36px; margin-bottom: 8px; }
+        h1 span { color: #656d76; font-size: 24px; font-weight: normal; }
+        .subtitle { font-size: 18px; color: #656d76; margin-bottom: 32px; }
+        h2 { font-size: 24px; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+        h3 { font-size: 18px; margin: 32px 0 12px; }
+        p { margin-bottom: 16px; }
+        code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 14px; font-family: "SFMono-Regular", Consolas, monospace; }
+        pre { background: var(--code-bg); padding: 16px; border-radius: 8px; overflow-x: auto; margin: 16px 0; border: 1px solid var(--border-color); }
+        pre code { background: none; padding: 0; }
+        ul, ol { margin: 16px 0 16px 24px; }
+        li { margin-bottom: 8px; }
+        .cmd-section { background: var(--sidebar-bg); border-radius: 8px; padding: 24px; margin: 24px 0; border: 1px solid var(--border-color); }
+        .cmd-section h3 { margin-top: 0; }
+        .back-link { display: inline-block; margin-bottom: 24px; color: var(--link-color); text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="sidebar-logo">lissh<span>.</span></div>
+            <div class="sidebar-tagline">SSH on a leash</div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Getting Started</div>
+                <ul class="nav-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#installation">Installation</a></li>
+                    <li><a href="index.html#quickstart">Quickstart</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Commands</div>
+                <ul class="nav-list">
+                    <li><a href="hosts.html">hosts</a></li>
+                    <li><a href="discover.html">discover</a></li>
+                    <li><a href="keys.html">keys</a></li>
+                    <li><a href="history.html">history</a></li>
+                    <li><a href="config.html" class="active">config</a></li>
+                    <li><a href="actions.html">actions</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Reference</div>
+                <ul class="nav-list">
+                    <li><a href="index.html#global-flags">Global Flags</a></li>
+                    <li><a href="https://github.com/wcrg/lissh" target="_blank">GitHub</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <main class="main">
+            <a href="index.html" class="back-link">&larr; Back to Home</a>
+            
+            <h1>lissh config <span>- SSH Config Helpers</span></h1>
+            <p class="subtitle">Manage SSH config entries for your hosts.</p>
+            
+            <h2>Usage</h2>
+            <pre><code>lissh config [command]</code></pre>
+            
+            <h2>Commands</h2>
+            
+            <div class="cmd-section">
+                <h3 id="show">show</h3>
+                <p>Show current SSH config.</p>
+                <pre><code>lissh config show</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="diff">diff</h3>
+                <p>Show recommended changes to SSH config.</p>
+                <pre><code>lissh config diff</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="generate">generate</h3>
+                <p>Generate SSH config entries for hosts.</p>
+                <pre><code>lissh config generate
+lissh config generate --host=&lt;id&gt;   # Specific host
+lissh config generate --all          # All hosts</code></pre>
+                
+                <p>Outputs SSH config format:</p>
+                <pre><code>Host webserver
+    HostName 192.168.1.100
+    User admin
+    Port 22
+    IdentityFile ~/.ssh/id_ed25519</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="apply">apply</h3>
+                <p>Apply generated config to <code>~/.ssh/config</code> (backup created).</p>
+                <pre><code>lissh config apply
+lissh config apply --dry-run         # Preview first</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="backup">backup</h3>
+                <p>Create a backup of your SSH config.</p>
+                <pre><code>lissh config backup</code></pre>
+                <p>Backups are stored in <code>~/.ssh/config.backup.&lt;timestamp&gt;</code>.</p>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="restore">restore</h3>
+                <p>Restore SSH config from a backup.</p>
+                <pre><code>lissh config restore &lt;file&gt;</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="keepalive">keepalive</h3>
+                <p>Enable or disable TCP keepalive.</p>
+                <pre><code>lissh config keepalive on
+lissh config keepalive off</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="compression">compression</h3>
+                <p>Enable or disable compression.</p>
+                <pre><code>lissh config compression on
+lissh config compression off</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="controlmaster">controlmaster</h3>
+                <p>Set ControlMaster setting.</p>
+                <pre><code>lissh config controlmaster auto
+lissh config controlmaster no</code></pre>
+            </div>
+            
+            <h2 id="ssh-config-integration">SSH Config Integration</h2>
+            <p>lissh can read hosts from your existing SSH config (<code>~/.ssh/config</code>) when you run:</p>
+            <pre><code>lissh discover run</code></pre>
+            
+            <p>This means:</p>
+            <ol>
+                <li>Hosts you add to SSH config manually</li>
+                <li>Custom settings like <code>IdentityFile</code>, <code>ProxyJump</code>, etc.</li>
+            </ol>
+            <p>...will be picked up by lissh discovery.</p>
+            
+            <h2 id="workflow">Typical Workflow</h2>
+            <pre><code># 1. Add/edit host in SSH config manually or with lissh
+nano ~/.ssh/config
+
+# 2. Discover new hosts
+lissh discover run
+
+# 3. Add alias and notes
+lissh hosts edit 16 --alias=webserver --notes="Production"
+
+# 4. Associate SSH key
+lissh hosts edit 16 --key-id=1
+
+# 5. Connect
+lissh webserver</code></pre>
+            
+            <h2 id="config-format">Config Format</h2>
+            <p>lissh generates standard SSH config entries:</p>
+            <pre><code>Host &lt;alias&gt;
+    HostName &lt;hostname-or-ip&gt;
+    User &lt;user&gt;
+    Port &lt;port&gt;
+    IdentityFile &lt;key-path&gt;</code></pre>
+            <p>All fields are optional and only included when set.</p>
+        </main>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

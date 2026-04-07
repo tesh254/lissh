@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lissh - SSH on a leash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --sidebar-bg: #f6f8fa;
+            --border-color: #d0d7de;
+            --text-color: #24292f;
+            --link-color: #0969da;
+            --code-bg: #f6f8fa;
+            --header-bg: #f6f8fa;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0d1117;
+                --sidebar-bg: #161b22;
+                --border-color: #30363d;
+                --text-color: #c9d1d9;
+                --link-color: #58a6ff;
+                --code-bg: #161b22;
+                --header-bg: #161b22;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        .sidebar-logo span { color: #0969da; }
+        .sidebar-tagline {
+            font-size: 14px;
+            color: #656d76;
+            margin-bottom: 24px;
+        }
+        .nav-section { margin-bottom: 24px; }
+        .nav-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #656d76;
+            margin-bottom: 8px;
+        }
+        .nav-list { list-style: none; }
+        .nav-list li { margin-bottom: 4px; }
+        .nav-list a {
+            display: block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .nav-list a:hover { background: var(--border-color); }
+        .nav-list a.active { background: #ddf4ff; color: var(--link-color); }
+        .main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 48px;
+            max-width: 900px;
+        }
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 48px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .hero h1 span { color: #0969da; }
+        .hero p {
+            font-size: 20px;
+            color: #656d76;
+            max-width: 600px;
+            margin: 0 auto 24px;
+        }
+        .badges { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+        }
+        .install-cmd {
+            display: inline-block;
+            background: var(--code-bg);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+        }
+        h2 {
+            font-size: 28px;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        h3 {
+            font-size: 20px;
+            margin: 32px 0 16px;
+        }
+        p { margin-bottom: 16px; }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+        .feature {
+            padding: 20px;
+            background: var(--sidebar-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .feature h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .feature p { font-size: 14px; color: #656d76; margin: 0; }
+        .cmd-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .cmd-card {
+            padding: 16px;
+            background: var(--sidebar-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .cmd-card h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--link-color);
+        }
+        .cmd-card code {
+            font-size: 13px;
+            color: #656d76;
+        }
+        .quickstart {
+            background: var(--sidebar-bg);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid var(--border-color);
+        }
+        .quickstart ol {
+            margin-left: 24px;
+        }
+        .quickstart li {
+            margin-bottom: 16px;
+        }
+        .quickstart code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="sidebar-logo">lissh<span>.</span></div>
+            <div class="sidebar-tagline">SSH on a leash</div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Getting Started</div>
+                <ul class="nav-list">
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#quickstart">Quickstart</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Commands</div>
+                <ul class="nav-list">
+                    <li><a href="hosts.html">hosts</a></li>
+                    <li><a href="discover.html">discover</a></li>
+                    <li><a href="keys.html">keys</a></li>
+                    <li><a href="history.html">history</a></li>
+                    <li><a href="config.html">config</a></li>
+                    <li><a href="actions.html">actions</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Reference</div>
+                <ul class="nav-list">
+                    <li><a href="#global-flags">Global Flags</a></li>
+                    <li><a href="#database">Database</a></li>
+                    <li><a href="https://github.com/wcrg/lissh" target="_blank">GitHub</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <main class="main">
+            <div class="hero">
+                <h1>lissh<span>.</span></h1>
+                <p>Keep your SSH hosts organized and on a leash. Quickly list and search hosts, assign friendly aliases, track your connection history, manage SSH keys, and tweak SSH settings.</p>
+                <div class="badges">
+                    <span class="badge">Go</span>
+                    <span class="badge">SQLite</span>
+                    <span class="badge">MIT License</span>
+                </div>
+                <div class="install-cmd">go install github.com/wcrg/lissh@latest</div>
+            </div>
+            
+            <h2 id="features">Features</h2>
+            <div class="features">
+                <div class="feature">
+                    <h4>Host Discovery</h4>
+                    <p>Automatically discover hosts from known_hosts and ~/.ssh/config</p>
+                </div>
+                <div class="feature">
+                    <h4>Host Labeling</h4>
+                    <p>Assign friendly aliases and notes to your servers</p>
+                </div>
+                <div class="feature">
+                    <h4>Connection History</h4>
+                    <p>Track when you connected and how long sessions lasted</p>
+                </div>
+                <div class="feature">
+                    <h4>SSH Key Management</h4>
+                    <p>Create, list, and associate keys with hosts</p>
+                </div>
+                <div class="feature">
+                    <h4>SSH Config Helpers</h4>
+                    <p>Apply recommended settings with backups and diffs</p>
+                </div>
+                <div class="feature">
+                    <h4>Remote Actions</h4>
+                    <p>Execute predefined commands on multiple hosts</p>
+                </div>
+            </div>
+            
+            <h2 id="installation">Installation</h2>
+            <pre><code class="language-bash">go install github.com/wcrg/lissh@latest</code></pre>
+            
+            <p>Or build from source:</p>
+            <pre><code class="language-bash">git clone https://github.com/wcrg/lissh.git
+cd lissh
+go build -o lissh</code></pre>
+            
+            <h2 id="quickstart">Quickstart</h2>
+            <div class="quickstart">
+                <ol>
+                    <li><strong>Discover your hosts</strong><br>
+                        <code>lissh discover run</code><br>
+                        Scans known_hosts and ~/.ssh/config to find your SSH servers.</li>
+                    <li><strong>Label your hosts</strong><br>
+                        <code>lissh discover review</code><br>
+                        Step through each host and assign friendly aliases.</li>
+                    <li><strong>Connect quickly</strong><br>
+                        <code>lissh hosts list</code> then <code>lissh hosts connect 1</code><br>
+                        Use IDs or aliases to jump into SSH sessions.</li>
+                </ol>
+            </div>
+            
+            <h2 id="commands">Commands</h2>
+            <div class="cmd-grid">
+                <div class="cmd-card">
+                    <h4>lissh hosts</h4>
+                    <code>Manage your SSH hosts - list, search, edit, connect</code>
+                </div>
+                <div class="cmd-card">
+                    <h4>lissh discover</h4>
+                    <code>Discover and label hosts from known_hosts and SSH config</code>
+                </div>
+                <div class="cmd-card">
+                    <h4>lissh keys</h4>
+                    <code>Manage SSH keys - create, list, associate with hosts</code>
+                </div>
+                <div class="cmd-card">
+                    <h4>lissh history</h4>
+                    <code>View connection history and statistics</code>
+                </div>
+                <div class="cmd-card">
+                    <h4>lissh config</h4>
+                    <code>SSH config helpers - generate, apply, backup</code>
+                </div>
+                <div class="cmd-card">
+                    <h4>lissh actions</h4>
+                    <code>Execute predefined commands on remote hosts</code>
+                </div>
+            </div>
+            
+            <h2 id="global-flags">Global Flags</h2>
+            <table style="width:100%; border-collapse: collapse; margin: 16px 0;">
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 8px 0;"><code>--db-path</code></td>
+                    <td style="padding: 8px 0;">Path to lissh database (default: ~/.lissh/lissh.db)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 8px 0;"><code>--check-update</code></td>
+                    <td style="padding: 8px 0;">Check for updates</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 8px 0;"><code>-i, --id</code></td>
+                    <td style="padding: 8px 0;">Connect to host by ID</td>
+                </tr>
+            </table>
+            
+            <h2 id="database">Database</h2>
+            <p>lissh stores all data in a SQLite database at <code>~/.lissh/lissh.db</code>. You can specify a custom path with <code>--db-path</code>.</p>
+            
+            <h3>Schema</h3>
+            <ul>
+                <li><strong>hosts</strong> - Host inventory with aliases, notes, and source</li>
+                <li><strong>ssh_keys</strong> - SSH key metadata</li>
+                <li><strong>history</strong> - Connection sessions with timestamps and duration</li>
+                <li><strong>actions</strong> - Predefined commands with variable substitution</li>
+                <li><strong>schema_migrations</strong> - Migration tracking</li>
+            </ul>
+        </main>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

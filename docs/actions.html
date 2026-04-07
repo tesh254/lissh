@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>actions - lissh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --sidebar-bg: #f6f8fa;
+            --border-color: #d0d7de;
+            --text-color: #24292f;
+            --link-color: #0969da;
+            --code-bg: #f6f8fa;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0d1117;
+                --sidebar-bg: #161b22;
+                --border-color: #30363d;
+                --text-color: #c9d1d9;
+                --link-color: #58a6ff;
+                --code-bg: #161b22;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-logo { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: var(--text-color); }
+        .sidebar-logo span { color: #0969da; }
+        .sidebar-tagline { font-size: 14px; color: #656d76; margin-bottom: 24px; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #656d76; margin-bottom: 8px; }
+        .nav-list { list-style: none; }
+        .nav-list li { margin-bottom: 4px; }
+        .nav-list a { display: block; padding: 6px 12px; border-radius: 6px; color: var(--text-color); text-decoration: none; font-size: 14px; }
+        .nav-list a:hover { background: var(--border-color); }
+        .nav-list a.active { background: #ddf4ff; color: var(--link-color); }
+        .main { flex: 1; margin-left: 280px; padding: 48px; max-width: 900px; }
+        h1 { font-size: 36px; margin-bottom: 8px; }
+        h1 span { color: #656d76; font-size: 24px; font-weight: normal; }
+        .subtitle { font-size: 18px; color: #656d76; margin-bottom: 32px; }
+        h2 { font-size: 24px; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+        h3 { font-size: 18px; margin: 32px 0 12px; }
+        p { margin-bottom: 16px; }
+        code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 14px; font-family: "SFMono-Regular", Consolas, monospace; }
+        pre { background: var(--code-bg); padding: 16px; border-radius: 8px; overflow-x: auto; margin: 16px 0; border: 1px solid var(--border-color); }
+        pre code { background: none; padding: 0; }
+        ul, ol { margin: 16px 0 16px 24px; }
+        li { margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border-color); }
+        th { font-weight: 600; }
+        .cmd-section { background: var(--sidebar-bg); border-radius: 8px; padding: 24px; margin: 24px 0; border: 1px solid var(--border-color); }
+        .cmd-section h3 { margin-top: 0; }
+        .flag-table { margin-left: 0; }
+        .flag-table tr { border: none; }
+        .flag-table td { border-bottom: 1px solid var(--border-color); padding: 8px 0; }
+        .flag-table td:first-child { width: 200px; }
+        .back-link { display: inline-block; margin-bottom: 24px; color: var(--link-color); text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+        .example { background: var(--sidebar-bg); border-radius: 6px; padding: 12px 16px; margin: 12px 0; border-left: 3px solid var(--link-color); }
+        .example-title { font-weight: 600; margin-bottom: 8px; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="sidebar-logo">lissh<span>.</span></div>
+            <div class="sidebar-tagline">SSH on a leash</div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Getting Started</div>
+                <ul class="nav-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#installation">Installation</a></li>
+                    <li><a href="index.html#quickstart">Quickstart</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Commands</div>
+                <ul class="nav-list">
+                    <li><a href="hosts.html">hosts</a></li>
+                    <li><a href="discover.html">discover</a></li>
+                    <li><a href="keys.html">keys</a></li>
+                    <li><a href="history.html">history</a></li>
+                    <li><a href="config.html">config</a></li>
+                    <li><a href="actions.html" class="active">actions</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Reference</div>
+                <ul class="nav-list">
+                    <li><a href="index.html#global-flags">Global Flags</a></li>
+                    <li><a href="https://github.com/wcrg/lissh" target="_blank">GitHub</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <main class="main">
+            <a href="index.html" class="back-link">&larr; Back to Home</a>
+            
+            <h1>lissh actions <span>- Remote Actions</span></h1>
+            <p class="subtitle">Manage and execute predefined commands on your SSH hosts without manually connecting.</p>
+            
+            <h2>Usage</h2>
+            <pre><code>lissh actions [command]</code></pre>
+            
+            <h2>Commands</h2>
+            
+            <div class="cmd-section">
+                <h3 id="list">list</h3>
+                <p>List all registered actions.</p>
+                <pre><code>lissh actions list</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="info">info</h3>
+                <p>Show detailed information about an action including its command, bound hosts, and required variables.</p>
+                <pre><code>lissh actions info &lt;name&gt;</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="add">add</h3>
+                <p>Create a new action.</p>
+                <pre><code>lissh actions add &lt;name&gt; [flags]</code></pre>
+                
+                <h4>Flags</h4>
+                <table class="flag-table">
+                    <tr><td><code>--command</code></td><td>The command template to execute (required)</td></tr>
+                    <tr><td><code>--description</code></td><td>Description of what the action does</td></tr>
+                    <tr><td><code>--host-alias</code></td><td>Comma-separated host aliases to bind (e.g., sigma-dev,sigma-beta)</td></tr>
+                </table>
+                
+                <div class="example">
+                    <div class="example-title">Create an action with bound hosts</div>
+                    <pre><code>lissh actions add logs \
+  --description "Stream docker logs" \
+  --command 'for id in $(docker ps --filter "name=${container}" --format "{{.ID}}"); do docker logs -f "$id" & done; wait' \
+  --host-alias sigma-dev,sigma-beta</code></pre>
+                </div>
+                
+                <div class="example">
+                    <div class="example-title">Create an unbound action (run on any host with --host-alias)</div>
+                    <pre><code>lissh actions add check-memory \
+  --description "Check server memory usage" \
+  --command 'free -h'</code></pre>
+                </div>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="edit">edit</h3>
+                <p>Update an existing action.</p>
+                <pre><code>lissh actions edit &lt;name&gt; [flags]</code></pre>
+                
+                <h4>Flags</h4>
+                <table class="flag-table">
+                    <tr><td><code>--command</code></td><td>Updated command template</td></tr>
+                    <tr><td><code>--description</code></td><td>Updated description</td></tr>
+                    <tr><td><code>--host-alias</code></td><td>Comma-separated host aliases (replaces existing)</td></tr>
+                    <tr><td><code>--add-host</code></td><td>Comma-separated host aliases to add (appends to existing)</td></tr>
+                </table>
+                
+                <div class="example">
+                    <div class="example-title">Update the command</div>
+                    <pre><code>lissh actions edit logs --command 'docker logs -f ${container}'</code></pre>
+                </div>
+                
+                <div class="example">
+                    <div class="example-title">Replace all bound hosts</div>
+                    <pre><code>lissh actions edit logs --host-alias sigma-dev,sigma-beta,production</code></pre>
+                </div>
+                
+                <div class="example">
+                    <div class="example-title">Add new hosts to existing bound hosts</div>
+                    <pre><code>lissh actions edit logs --add-host sigma-beta,new-server</code></pre>
+                </div>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="delete">delete</h3>
+                <p>Delete an action.</p>
+                <pre><code>lissh actions delete &lt;name&gt;
+lissh actions delete &lt;name&gt; --confirm  # Skip confirmation</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="run">run</h3>
+                <p>Execute an action on its bound hosts (or a specific host).</p>
+                <pre><code>lissh actions run &lt;name&gt; [flags]</code></pre>
+                
+                <h4>Flags</h4>
+                <table class="flag-table">
+                    <tr><td><code>--set</code></td><td>Set variable values (e.g., --set container=myapp)</td></tr>
+                    <tr><td><code>--host-alias</code></td><td>Run on specific host (must be bound to action)</td></tr>
+                    <tr><td><code>--alias</code></td><td>Alias of bound host to run on (stricter than --host-alias)</td></tr>
+                </table>
+                
+                <div class="example">
+                    <div class="example-title">Run with variable provided via flag</div>
+                    <pre><code>lissh actions run logs --set container=sigma_merl</code></pre>
+                </div>
+                
+                <div class="example">
+                    <div class="example-title">Run (will prompt for ${container} value)</div>
+                    <pre><code>lissh actions run logs</code></pre>
+                </div>
+                
+                <div class="example">
+                    <div class="example-title">Run on a specific bound host</div>
+                    <pre><code>lissh actions run logs --alias sigma-beta --set container=api</code></pre>
+                </div>
+                
+                <div class="example">
+                    <div class="example-title">Run on unbound host (use --host-alias)</div>
+                    <pre><code>lissh actions run check-memory --host-alias webserver</code></pre>
+                </div>
+            </div>
+            
+            <h2 id="variable-substitution">Variable Substitution</h2>
+            <p>Actions support variable substitution using <code>${variable_name}</code> syntax:</p>
+            <pre><code># Command with variables
+lissh actions add deploy \
+  --command 'cd /opt/${app} && git pull && systemctl restart ${service}' \
+  --host-alias production
+
+# Run with variables
+lissh actions run deploy --set app=myapp --set service=myapp.service</code></pre>
+            
+            <p>When a variable is not provided via <code>--set</code>, you will be prompted to enter a value interactively.</p>
+            
+            <h2 id="use-cases">Use Cases</h2>
+            
+            <h3>Docker Logs Streaming</h3>
+            <pre><code>lissh actions add docker-logs \
+  --description "Stream docker container logs" \
+  --command 'for id in $(docker ps --filter "name=${container}" --format "{{.ID}}"); do docker logs -f "$id" & done; wait' \
+  --host-alias sigma-dev,sigma-beta
+
+# Run
+lissh actions run docker-logs --set container=sigma_merl</code></pre>
+            
+            <h3>System Monitoring</h3>
+            <pre><code>lissh actions add system-info \
+  --description "Get system information" \
+  --command 'echo "=== CPU ===" && nproc && echo "=== Memory ===" && free -h && echo "=== Disk ===" && df -h'
+
+lissh actions run system-info</code></pre>
+            
+            <h3>Service Management</h3>
+            <pre><code>lissh actions add restart-app \
+  --description "Restart application service" \
+  --command 'sudo systemctl restart ${service}' \
+  --host-alias production
+
+lissh actions run restart-app --set service=myapp</code></pre>
+            
+            <h2 id="multi-host">Multi-Host Execution</h2>
+            <p>When an action is bound to multiple hosts, running the action executes it on each host sequentially:</p>
+            <pre><code>→ [1/3] Host: 194.164.121.64
+  Alias: sigma-beta
+  ───────────────────────────────────────────────────────────
+  (output from sigma-beta)
+
+→ [2/3] Host: 82.165.205.201
+  Alias: sigma-dev
+  ───────────────────────────────────────────────────────────
+  (output from sigma-dev)</code></pre>
+        </main>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>
