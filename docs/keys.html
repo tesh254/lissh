@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>keys - lissh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --sidebar-bg: #f6f8fa;
+            --border-color: #d0d7de;
+            --text-color: #24292f;
+            --link-color: #0969da;
+            --code-bg: #f6f8fa;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0d1117;
+                --sidebar-bg: #161b22;
+                --border-color: #30363d;
+                --text-color: #c9d1d9;
+                --link-color: #58a6ff;
+                --code-bg: #161b22;
+            }
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-logo { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: var(--text-color); }
+        .sidebar-logo span { color: #0969da; }
+        .sidebar-tagline { font-size: 14px; color: #656d76; margin-bottom: 24px; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #656d76; margin-bottom: 8px; }
+        .nav-list { list-style: none; }
+        .nav-list li { margin-bottom: 4px; }
+        .nav-list a { display: block; padding: 6px 12px; border-radius: 6px; color: var(--text-color); text-decoration: none; font-size: 14px; }
+        .nav-list a:hover { background: var(--border-color); }
+        .nav-list a.active { background: #ddf4ff; color: var(--link-color); }
+        .main { flex: 1; margin-left: 280px; padding: 48px; max-width: 900px; }
+        h1 { font-size: 36px; margin-bottom: 8px; }
+        h1 span { color: #656d76; font-size: 24px; font-weight: normal; }
+        .subtitle { font-size: 18px; color: #656d76; margin-bottom: 32px; }
+        h2 { font-size: 24px; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+        h3 { font-size: 18px; margin: 32px 0 12px; }
+        p { margin-bottom: 16px; }
+        code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 14px; font-family: "SFMono-Regular", Consolas, monospace; }
+        pre { background: var(--code-bg); padding: 16px; border-radius: 8px; overflow-x: auto; margin: 16px 0; border: 1px solid var(--border-color); }
+        pre code { background: none; padding: 0; }
+        ul, ol { margin: 16px 0 16px 24px; }
+        li { margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border-color); }
+        th { font-weight: 600; }
+        .cmd-section { background: var(--sidebar-bg); border-radius: 8px; padding: 24px; margin: 24px 0; border: 1px solid var(--border-color); }
+        .cmd-section h3 { margin-top: 0; }
+        .flag-table { margin-left: 0; }
+        .flag-table tr { border: none; }
+        .flag-table td { border-bottom: 1px solid var(--border-color); padding: 8px 0; }
+        .flag-table td:first-child { width: 200px; }
+        .back-link { display: inline-block; margin-bottom: 24px; color: var(--link-color); text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+        .warning { background: #fff8c5; border: 1px solid #f0c000; border-radius: 4px; padding: 12px 16px; margin: 16px 0; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="sidebar-logo">lissh<span>.</span></div>
+            <div class="sidebar-tagline">SSH on a leash</div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Getting Started</div>
+                <ul class="nav-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#installation">Installation</a></li>
+                    <li><a href="index.html#quickstart">Quickstart</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Commands</div>
+                <ul class="nav-list">
+                    <li><a href="hosts.html">hosts</a></li>
+                    <li><a href="discover.html">discover</a></li>
+                    <li><a href="keys.html" class="active">keys</a></li>
+                    <li><a href="history.html">history</a></li>
+                    <li><a href="config.html">config</a></li>
+                    <li><a href="actions.html">actions</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Reference</div>
+                <ul class="nav-list">
+                    <li><a href="index.html#global-flags">Global Flags</a></li>
+                    <li><a href="https://github.com/wcrg/lissh" target="_blank">GitHub</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <main class="main">
+            <a href="index.html" class="back-link">&larr; Back to Home</a>
+            
+            <h1>lissh keys <span>- SSH Key Management</span></h1>
+            <p class="subtitle">Manage SSH keys for authentication.</p>
+            
+            <h2>Usage</h2>
+            <pre><code>lissh keys [command]</code></pre>
+            
+            <h2>Commands</h2>
+            
+            <div class="cmd-section">
+                <h3 id="list">list</h3>
+                <p>List all registered SSH keys. Shows private key path, public key path, type, and bits.</p>
+                <pre><code>lissh keys list</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="scan">scan</h3>
+                <p>Scan <code>~/.ssh</code> for keys and register them.</p>
+                <pre><code>lissh keys scan</code></pre>
+                
+                <p>Recognizes keys by naming patterns:</p>
+                <ul>
+                    <li><code>id_rsa</code>, <code>id_ed25519</code>, <code>id_ecdsa</code>, <code>id_dsa</code></li>
+                    <li><code>*_rsa</code>, <code>*_ed25519</code>, <code>*_ecdsa</code>, <code>*_dsa</code></li>
+                </ul>
+                
+                <p>Skips non-key files like <code>known_hosts</code>, <code>config</code>, <code>authorized_keys</code>.</p>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="info">info</h3>
+                <p>Show detailed information about a key. Shows path, type, size, comment, fingerprint, and associated hosts.</p>
+                <pre><code>lissh keys info &lt;id&gt;</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="create">create</h3>
+                <p>Generate a new SSH keypair.</p>
+                <pre><code>lissh keys create &lt;filename&gt; [flags]</code></pre>
+                
+                <h4>Flags</h4>
+                <table class="flag-table">
+                    <tr><td><code>--type</code></td><td>Key type (rsa, ed25519). Default: ed25519</td></tr>
+                    <tr><td><code>--bits</code></td><td>Key size (RSA default 4096, Ed25519 default 256)</td></tr>
+                    <tr><td><code>--comment</code></td><td>Comment for the key</td></tr>
+                </table>
+                
+                <h4>Examples</h4>
+                <pre><code># Create Ed25519 key (default)
+lissh keys create mykey
+
+# Create RSA key with custom bits
+lissh keys create mykey --type=rsa --bits=8192
+
+# Create with comment
+lissh keys create deploy --comment="deploy@production"</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="associate">associate</h3>
+                <p>Link a key to a host. The key will be used when connecting to that host.</p>
+                <pre><code>lissh keys associate &lt;key-id&gt; &lt;host-id&gt;</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="remove">remove</h3>
+                <p>Remove a key from lissh (does not delete the key file).</p>
+                <pre><code>lissh keys remove &lt;id&gt;</code></pre>
+            </div>
+            
+            <div class="cmd-section">
+                <h3 id="delete">delete</h3>
+                <p>Permanently delete a key and its file.</p>
+                <pre><code>lissh keys delete &lt;id&gt;
+lissh keys delete &lt;id&gt; --dry-run     # Preview
+lissh keys delete &lt;id&gt; --confirm      # Skip confirmation</code></pre>
+                
+                <div class="warning">
+                    <strong>Warning:</strong> This deletes both the private and public key files.
+                </div>
+            </div>
+            
+            <h2 id="key-properties">Key Properties</h2>
+            <p>Each key has:</p>
+            <ul>
+                <li><strong>ID</strong> - Unique identifier</li>
+                <li><strong>Name</strong> - Filename (e.g., <code>id_ed25519</code>)</li>
+                <li><strong>Path</strong> - Private key location</li>
+                <li><strong>Public Key Path</strong> - Public key location (<code>&lt;path&gt;.pub</code>)</li>
+                <li><strong>Type</strong> - Key algorithm (rsa, ed25519, etc.)</li>
+                <li><strong>Bits</strong> - Key size</li>
+                <li><strong>Comment</strong> - Key comment (usually email or identifier)</li>
+                <li><strong>Fingerprint</strong> - SSH key fingerprint</li>
+            </ul>
+            
+            <h2 id="using-keys">Using Keys with Hosts</h2>
+            <p>To use a specific key when connecting, associate it with a host:</p>
+            <pre><code>lissh keys associate 1 16</code></pre>
+            <p>Or when editing a host:</p>
+            <pre><code>lissh hosts edit 16 --key-id=1</code></pre>
+        </main>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>
