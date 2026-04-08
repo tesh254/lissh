@@ -22,3 +22,4 @@ go.work
 
 dist/
 go-cli-template
+lissh
